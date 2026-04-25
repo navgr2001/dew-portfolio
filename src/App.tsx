@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { Header } from "./sections/Header";
 import { HeroSection } from "./sections/HeroSection";
 import { AboutSection } from "./sections/AboutSection";
@@ -8,10 +7,6 @@ import { SkillsSection } from "./sections/SkillsSection";
 import { ContactSection } from "./sections/ContactSection";
 import { Footer } from "./sections/Footer";
 import { BackToTopButton } from "./components/BackToTopButton";
-import {
-  getSectionIdFromPath,
-  scrollToSectionById,
-} from "./utils/sectionNavigation";
 
 type Theme = "dark" | "light";
 
@@ -32,7 +27,6 @@ function getInitialTheme(): Theme {
 }
 
 function App() {
-  const location = useLocation();
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
@@ -41,21 +35,47 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-    const targetSectionId = getSectionIdFromPath(location.pathname);
+    const protectedSelector = [
+      "img",
+      ".theme-brand",
+      ".theme-hero-card",
+      ".project-gallery-main",
+      ".project-thumbnail",
+      ".project-lightbox-stage",
+      ".project-lightbox-thumbnails",
+    ].join(",");
 
-    if (!targetSectionId) {
-      return;
-    }
+    const isProtectedTarget = (target: EventTarget | null) =>
+      target instanceof Element && Boolean(target.closest(protectedSelector));
 
-    const frameId = window.requestAnimationFrame(() => {
-      scrollToSectionById(
-        targetSectionId,
-        location.pathname === "/" ? "auto" : "smooth",
-      );
-    });
+    const handleContextMenu = (event: MouseEvent) => {
+      if (isProtectedTarget(event.target)) {
+        event.preventDefault();
+      }
+    };
 
-    return () => window.cancelAnimationFrame(frameId);
-  }, [location.pathname]);
+    const handleDragStart = (event: DragEvent) => {
+      if (isProtectedTarget(event.target)) {
+        event.preventDefault();
+      }
+    };
+
+    const handleSelectStart = (event: Event) => {
+      if (isProtectedTarget(event.target)) {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu, true);
+    document.addEventListener("dragstart", handleDragStart, true);
+    document.addEventListener("selectstart", handleSelectStart, true);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu, true);
+      document.removeEventListener("dragstart", handleDragStart, true);
+      document.removeEventListener("selectstart", handleSelectStart, true);
+    };
+  }, []);
 
   const isLightMode = useMemo(() => theme === "light", [theme]);
 

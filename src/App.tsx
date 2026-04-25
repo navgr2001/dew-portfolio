@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Header } from "./sections/Header";
 import { HeroSection } from "./sections/HeroSection";
 import { AboutSection } from "./sections/AboutSection";
@@ -7,6 +8,10 @@ import { SkillsSection } from "./sections/SkillsSection";
 import { ContactSection } from "./sections/ContactSection";
 import { Footer } from "./sections/Footer";
 import { BackToTopButton } from "./components/BackToTopButton";
+import {
+  getSectionIdFromPath,
+  scrollToSectionById,
+} from "./utils/sectionNavigation";
 
 type Theme = "dark" | "light";
 
@@ -15,24 +20,51 @@ function getInitialTheme(): Theme {
     return "dark";
   }
 
-  const savedTheme = window.localStorage.getItem("portfolio-theme");
+  try {
+    const savedTheme = window.localStorage.getItem("portfolio-theme");
 
-  if (savedTheme === "dark" || savedTheme === "light") {
-    return savedTheme;
+    if (savedTheme === "dark" || savedTheme === "light") {
+      return savedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark";
+  } catch {
+    return "dark";
   }
-
-  return window.matchMedia("(prefers-color-scheme: light)").matches
-    ? "light"
-    : "dark";
 }
 
 function App() {
+  const location = useLocation();
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    window.localStorage.setItem("portfolio-theme", theme);
+
+    try {
+      window.localStorage.setItem("portfolio-theme", theme);
+    } catch {
+      // localStorage can fail in some privacy modes.
+    }
   }, [theme]);
+
+  useEffect(() => {
+    const sectionId = getSectionIdFromPath(location.pathname);
+
+    if (!sectionId) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      scrollToSectionById(
+        sectionId,
+        location.pathname === "/" ? "auto" : "smooth",
+      );
+    }, 50);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [location.pathname]);
 
   useEffect(() => {
     const protectedSelector = [

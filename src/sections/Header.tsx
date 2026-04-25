@@ -1,8 +1,11 @@
 import { useState } from "react";
+import type { MouseEvent } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { HiMenuAlt3, HiMoon, HiSun, HiX } from "react-icons/hi";
 import { Container } from "../components/Container";
 import { navItems } from "../data/content";
+import { scrollToSectionById } from "../utils/sectionNavigation";
 
 type HeaderProps = {
   isLightMode: boolean;
@@ -11,6 +14,34 @@ type HeaderProps = {
 
 export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    setIsOpen(false);
+
+    if (location.pathname !== "/") {
+      navigate("/");
+      return;
+    }
+
+    scrollToSectionById("home");
+  };
+
+  const handleNavClick =
+    (path: string, targetId: string) =>
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      setIsOpen(false);
+
+      if (location.pathname !== path) {
+        navigate(path);
+        return;
+      }
+
+      scrollToSectionById(targetId);
+    };
 
   return (
     <motion.header
@@ -20,7 +51,12 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
       className="theme-header fixed inset-x-0 top-0 z-[9999] w-full backdrop-blur-xl"
     >
       <Container className="flex min-h-20 items-center justify-between gap-4">
-        <a href="#home" className="theme-brand" aria-label="Go to home">
+        <Link
+          to="/"
+          onClick={handleHomeClick}
+          className="theme-brand"
+          aria-label="Go to home"
+        >
           <img
             src={
               isLightMode
@@ -30,13 +66,18 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
             alt="Dewmini"
             className="theme-brand-image"
           />
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
-            <a key={item.href} href={item.href} className="nav-link">
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={handleNavClick(item.path, item.targetId)}
+              className="nav-link"
+            >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -92,14 +133,14 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
         <div className="theme-mobile-menu md:hidden">
           <Container className="flex flex-col py-5">
             {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
+              <Link
+                key={item.path}
+                to={item.path}
                 className="theme-mobile-link border-b py-4 text-sm uppercase tracking-[0.3em] last:border-b-0"
-                onClick={() => setIsOpen(false)}
+                onClick={handleNavClick(item.path, item.targetId)}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </Container>
         </div>

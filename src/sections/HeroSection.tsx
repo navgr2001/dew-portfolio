@@ -1,10 +1,14 @@
 import { useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "motion/react";
 import { Container } from "../components/Container";
 import { designer } from "../data/content";
+import { scrollToSectionById } from "../utils/sectionNavigation";
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -15,6 +19,15 @@ export function HeroSection() {
   const rightOrbY = useTransform(scrollYProgress, [0, 1], [0, 110]);
   const heroContentY = useTransform(scrollYProgress, [0, 1], [0, -24]);
   const heroVisualY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+
+  const handleProjectsClick = () => {
+    if (location.pathname !== "/projects") {
+      navigate("/projects");
+      return;
+    }
+
+    scrollToSectionById("projects");
+  };
 
   return (
     <section
@@ -66,14 +79,15 @@ export function HeroSection() {
                 Download CV
               </motion.a>
 
-              <motion.a
-                href="#projects"
+              <motion.button
+                type="button"
                 whileHover={{ y: -3, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={handleProjectsClick}
                 className="secondary-button"
               >
                 View Projects
-              </motion.a>
+              </motion.button>
             </div>
           </motion.div>
 

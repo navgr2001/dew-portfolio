@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Header } from "./sections/Header";
 import { HeroSection } from "./sections/HeroSection";
 import { AboutSection } from "./sections/AboutSection";
@@ -7,6 +8,10 @@ import { SkillsSection } from "./sections/SkillsSection";
 import { ContactSection } from "./sections/ContactSection";
 import { Footer } from "./sections/Footer";
 import { BackToTopButton } from "./components/BackToTopButton";
+import {
+  getSectionIdFromPath,
+  scrollToSectionById,
+} from "./utils/sectionNavigation";
 
 type Theme = "dark" | "light";
 
@@ -27,12 +32,30 @@ function getInitialTheme(): Theme {
 }
 
 function App() {
+  const location = useLocation();
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     window.localStorage.setItem("portfolio-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const targetSectionId = getSectionIdFromPath(location.pathname);
+
+    if (!targetSectionId) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      scrollToSectionById(
+        targetSectionId,
+        location.pathname === "/" ? "auto" : "smooth",
+      );
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [location.pathname]);
 
   const isLightMode = useMemo(() => theme === "light", [theme]);
 

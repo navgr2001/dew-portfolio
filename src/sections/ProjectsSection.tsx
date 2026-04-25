@@ -597,7 +597,7 @@ export function ProjectsSection() {
             aria-label={`${selectedProject.title} image viewer`}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="project-lightbox-header">
+            <div className="project-lightbox-topbar">
               <div className="min-w-0">
                 <p className="project-lightbox-eyebrow">
                   {selectedProject.category} • {selectedProject.year}
@@ -605,86 +605,109 @@ export function ProjectsSection() {
                 <h3 className="project-lightbox-title">
                   {selectedProject.title}
                 </h3>
+                <p className="project-lightbox-helper">
+                  Use the side arrows, keyboard arrow keys, or thumbnails to
+                  switch images.
+                </p>
               </div>
 
-              <button
-                type="button"
-                onClick={closeViewer}
-                className="project-lightbox-close"
-                aria-label="Close image popup"
+              <div className="project-lightbox-topbar-actions">
+                <p className="project-lightbox-counter">
+                  Image {viewerIndex + 1} of {selectedProjectImages.length}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={closeViewer}
+                  className="project-lightbox-close"
+                  aria-label="Close image popup"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="project-lightbox-content">
+              <div
+                className="project-lightbox-stage"
+                onTouchStart={handleViewerTouchStart}
+                onTouchEnd={handleViewerTouchEnd}
               >
-                ×
-              </button>
-            </div>
+                {selectedProjectImages.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={showPreviousViewerImage}
+                    className="project-lightbox-nav project-lightbox-nav--left"
+                    aria-label="Show previous image"
+                  >
+                    ‹
+                  </button>
+                ) : null}
 
-            <div
-              className="project-lightbox-stage"
-              onTouchStart={handleViewerTouchStart}
-              onTouchEnd={handleViewerTouchEnd}
-            >
-              {selectedProjectImages.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={showPreviousViewerImage}
-                  className="project-lightbox-nav project-lightbox-nav--left"
-                  aria-label="Show previous image"
-                >
-                  ‹
-                </button>
-              ) : null}
+                <img
+                  key={viewerImage}
+                  src={viewerImage}
+                  alt={`${selectedProject.title} enlarged view ${viewerIndex + 1}`}
+                  className="project-lightbox-image"
+                />
 
-              <img
-                key={viewerImage}
-                src={viewerImage}
-                alt={`${selectedProject.title} enlarged view ${viewerIndex + 1}`}
-                className="project-lightbox-image"
-              />
-
-              {selectedProjectImages.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={showNextViewerImage}
-                  className="project-lightbox-nav project-lightbox-nav--right"
-                  aria-label="Show next image"
-                >
-                  ›
-                </button>
-              ) : null}
-            </div>
-
-            <div className="project-lightbox-footer">
-              <p className="project-lightbox-counter">
-                Image {viewerIndex + 1} of {selectedProjectImages.length}
-              </p>
+                {selectedProjectImages.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={showNextViewerImage}
+                    className="project-lightbox-nav project-lightbox-nav--right"
+                    aria-label="Show next image"
+                  >
+                    ›
+                  </button>
+                ) : null}
+              </div>
 
               {selectedProjectImages.length > 1 ? (
-                <div className="project-lightbox-thumbnails">
-                  {selectedProjectImages.map((image, index) => {
-                    const isActiveViewerImage = index === viewerIndex;
+                <aside className="project-lightbox-sidebar">
+                  <div className="project-lightbox-sidebar-header">
+                    <p className="project-lightbox-sidebar-title">Gallery</p>
+                    <p className="project-lightbox-sidebar-subtitle">
+                      Select an image
+                    </p>
+                  </div>
 
-                    return (
-                      <button
-                        key={`${selectedProject.title}-viewer-image-${index}`}
-                        type="button"
-                        onClick={() => setActiveViewerImage(index)}
-                        className={`project-thumbnail ${
-                          isActiveViewerImage ? "project-thumbnail--active" : ""
-                        }`}
-                        aria-label={`Open image ${index + 1}`}
-                      >
-                        <img
-                          src={image}
-                          alt={`${selectedProject.title} thumbnail ${index + 1}`}
-                          className={`project-thumbnail-image ${
-                            isContainProject
-                              ? "project-thumbnail-image--contain"
-                              : "project-thumbnail-image--cover"
+                  <div className="project-lightbox-thumbnails">
+                    {selectedProjectImages.map((image, index) => {
+                      const isActiveViewerImage = index === viewerIndex;
+
+                      return (
+                        <button
+                          key={`${selectedProject.title}-viewer-image-${index}`}
+                          type="button"
+                          onClick={() => setActiveViewerImage(index)}
+                          className={`project-thumbnail ${
+                            isActiveViewerImage
+                              ? "project-thumbnail--active"
+                              : ""
                           }`}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
+                          aria-label={`Open image ${index + 1}`}
+                        >
+                          <img
+                            src={image}
+                            alt={`${selectedProject.title} thumbnail ${index + 1}`}
+                            className={`project-thumbnail-image ${
+                              isContainProject
+                                ? "project-thumbnail-image--contain"
+                                : "project-thumbnail-image--cover"
+                            }`}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="project-lightbox-sidebar-tip">
+                    <span>←</span>
+                    <span>→</span>
+                    <p>Keyboard navigation supported</p>
+                  </div>
+                </aside>
               ) : null}
             </div>
           </motion.div>

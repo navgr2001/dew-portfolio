@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { TouchEvent } from "react";
 import { motion } from "motion/react";
 import { Container } from "../components/Container";
 import { SectionHeading } from "../components/SectionHeading";
@@ -6,6 +7,7 @@ import { projects } from "../data/content";
 
 const INITIAL_VISIBLE_COUNT = 6;
 const LOAD_MORE_COUNT = 6;
+const SWIPE_THRESHOLD = 48;
 
 function getProjectGalleryImages(project: {
   image: string;
@@ -28,6 +30,8 @@ export function ProjectsSection() {
   const [viewerIndex, setViewerIndex] = useState(0);
 
   const carouselRef = useRef<HTMLDivElement | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
 
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
@@ -58,20 +62,29 @@ export function ProjectsSection() {
     setVisibleCount(INITIAL_VISIBLE_COUNT);
   }, [activeCategory, searchTerm]);
 
+  const selectedProject = useMemo(
+    () =>
+      filteredProjects.find(
+        (project) => project.title === selectedProjectTitle,
+      ) ?? filteredProjects[0],
+    [filteredProjects, selectedProjectTitle],
+  );
+
+  const selectedProjectImages = useMemo(
+    () => (selectedProject ? getProjectGalleryImages(selectedProject) : []),
+    [selectedProject],
+  );
+
   useEffect(() => {
     if (filteredProjects.length === 0) {
       setSelectedProjectTitle(null);
       setSelectedImage("");
-      setIsViewerOpen(false);
       setViewerIndex(0);
+      setIsViewerOpen(false);
       return;
     }
 
-    const matchedSelectedProject = filteredProjects.find(
-      (project) => project.title === selectedProjectTitle,
-    );
-
-    if (!matchedSelectedProject) {
+    if (!selectedProject) {
       const firstProject = filteredProjects[0];
       const firstProjectGallery = getProjectGalleryImages(firstProject);
 
@@ -81,25 +94,16 @@ export function ProjectsSection() {
       return;
     }
 
-    const availableImages = getProjectGalleryImages(matchedSelectedProject);
+    const currentImageIndex = selectedProjectImages.indexOf(selectedImage);
 
-    if (!availableImages.includes(selectedImage)) {
-      setSelectedImage(availableImages[0] ?? matchedSelectedProject.image);
+    if (currentImageIndex === -1) {
+      setSelectedImage(selectedProjectImages[0] ?? selectedProject.image);
       setViewerIndex(0);
+      return;
     }
-  }, [filteredProjects, selectedProjectTitle, selectedImage]);
 
-  const selectedProject =
-    filteredProjects.find(
-      (project) => project.title === selectedProjectTitle,
-    ) ?? filteredProjects[0];
-
-  const selectedProjectImages = selectedProject
-    ? getProjectGalleryImages(selectedProject)
-    : [];
-
-  const viewerImage =
-    selectedProjectImages[viewerIndex] ?? selectedProjectImages[0] ?? "";
+    setViewerIndex(currentImageIndex);
+  }, [filteredProjects, selectedProject, selectedProjectImages, selectedImage]);
 
   const visibleProjects = filteredProjects
     .filter((project) => project.title !== selectedProject?.title)
@@ -123,13 +127,33 @@ export function ProjectsSection() {
     });
   };
 
-  const openViewer = (image: string) => {
+  const setActiveProjectImage = (image: string) => {
+    setSelectedImage(image);
+
+    const nextIndex = selectedProjectImages.indexOf(image);
+    if (nextIndex >= 0) {
+      setViewerIndex(nextIndex);
+    }
+  };
+
+  const setActiveViewerImage = (index: number) => {
     if (selectedProjectImages.length === 0) {
       return;
     }
 
+    const normalizedIndex =
+      ((index % selectedProjectImages.length) + selectedProjectImages.length) %
+      selectedProjectImages.length;
+
+    const nextImage = selectedProjectImages[normalizedIndex];
+
+    setViewerIndex(normalizedIndex);
+    setSelectedImage(nextImage);
+  };
+
+  const openViewer = (image: string) => {
     const nextIndex = selectedProjectImages.indexOf(image);
-    setViewerIndex(nextIndex >= 0 ? nextIndex : 0);
+    setActiveViewerImage(nextIndex >= 0 ? nextIndex : 0);
     setIsViewerOpen(true);
   };
 
@@ -138,40 +162,12 @@ export function ProjectsSection() {
   };
 
   const showPreviousViewerImage = () => {
-    if (selectedProjectImages.length <= 1) {
-      return;
-    }
-
-    setViewerIndex((currentIndex) =>
-      currentIndex === 0 ? selectedProjectImages.length - 1 : currentIndex - 1,
-    );
+    setActiveViewerImage(viewerIndex - 1);
   };
 
   const showNextViewerImage = () => {
-    if (selectedProjectImages.length <= 1) {
-      return;
-    }
-
-    setViewerIndex(
-      (currentIndex) => (currentIndex + 1) % selectedProjectImages.length,
-    );
+    setActiveViewerImage(viewerIndex + 1);
   };
-
-  useEffect(() => {
-    if (!isViewerOpen) {
-      return undefined;
-    }
-
-    const currentImageIndex = selectedProjectImages.indexOf(selectedImage);
-
-    if (currentImageIndex >= 0) {
-      setViewerIndex(currentImageIndex);
-      return undefined;
-    }
-
-    setViewerIndex(0);
-    return undefined;
-  }, [isViewerOpen, selectedProjectImages, selectedImage]);
 
   useEffect(() => {
     if (!isViewerOpen) {
@@ -217,7 +213,43 @@ export function ProjectsSection() {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isViewerOpen, selectedProjectImages.length]);
+  }, [isViewerOpen, viewerIndex, selectedProjectImages.length]);
+
+  const handleViewerTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const firstTouch = event.touches[0];
+    touchStartXRef.current = firstTouch.clientX;
+    touchStartYRef.current = firstTouch.clientY;
+  };
+
+  const handleViewerTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) {
+      return;
+    }
+
+    const changedTouch = event.changedTouches[0];
+    const deltaX = changedTouch.clientX - touchStartXRef.current;
+    const deltaY = changedTouch.clientY - touchStartYRef.current;
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (
+      Math.abs(deltaX) < SWIPE_THRESHOLD ||
+      Math.abs(deltaX) <= Math.abs(deltaY)
+    ) {
+      return;
+    }
+
+    if (deltaX > 0) {
+      showPreviousViewerImage();
+      return;
+    }
+
+    showNextViewerImage();
+  };
+
+  const viewerImage =
+    selectedProjectImages[viewerIndex] ?? selectedProjectImages[0] ?? "";
 
   const isContainProject = selectedProject?.imageFit === "contain";
 
@@ -340,7 +372,7 @@ export function ProjectsSection() {
                               <button
                                 key={`${selectedProject.title}-image-${index}`}
                                 type="button"
-                                onClick={() => setSelectedImage(image)}
+                                onClick={() => setActiveProjectImage(image)}
                                 className={`project-thumbnail ${
                                   isActiveImage
                                     ? "project-thumbnail--active"
@@ -464,6 +496,7 @@ export function ProjectsSection() {
                       setSelectedProjectTitle(project.title);
                       setSelectedImage(projectGallery[0] ?? project.image);
                       setViewerIndex(0);
+                      setIsViewerOpen(false);
                     }}
                     className="glass-panel project-card-button group overflow-hidden text-left"
                   >
@@ -584,7 +617,11 @@ export function ProjectsSection() {
               </button>
             </div>
 
-            <div className="project-lightbox-stage">
+            <div
+              className="project-lightbox-stage"
+              onTouchStart={handleViewerTouchStart}
+              onTouchEnd={handleViewerTouchEnd}
+            >
               {selectedProjectImages.length > 1 ? (
                 <button
                   type="button"
@@ -629,7 +666,7 @@ export function ProjectsSection() {
                       <button
                         key={`${selectedProject.title}-viewer-image-${index}`}
                         type="button"
-                        onClick={() => setViewerIndex(index)}
+                        onClick={() => setActiveViewerImage(index)}
                         className={`project-thumbnail ${
                           isActiveViewerImage ? "project-thumbnail--active" : ""
                         }`}
@@ -638,7 +675,11 @@ export function ProjectsSection() {
                         <img
                           src={image}
                           alt={`${selectedProject.title} thumbnail ${index + 1}`}
-                          className="project-thumbnail-image project-thumbnail-image--contain"
+                          className={`project-thumbnail-image ${
+                            isContainProject
+                              ? "project-thumbnail-image--contain"
+                              : "project-thumbnail-image--cover"
+                          }`}
                         />
                       </button>
                     );

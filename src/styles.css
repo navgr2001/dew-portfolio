@@ -1327,3 +1327,13 @@ footer {
     gap: 0.55rem;
   }
 }
+.project-lightbox-stage {
+  touch-action: pan-y;
+}
+
+.project-lightbox-close,
+.project-lightbox-nav,
+.project-thumbnail,
+.project-gallery-main-button {
+  -webkit-tap-highlight-color: transparent;
+}

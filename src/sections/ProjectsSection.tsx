@@ -24,6 +24,8 @@ export function ProjectsSection() {
   const [selectedImage, setSelectedImage] = useState<string>(
     projects[0]?.image ?? "",
   );
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
 
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,6 +62,8 @@ export function ProjectsSection() {
     if (filteredProjects.length === 0) {
       setSelectedProjectTitle(null);
       setSelectedImage("");
+      setIsViewerOpen(false);
+      setViewerIndex(0);
       return;
     }
 
@@ -73,6 +77,7 @@ export function ProjectsSection() {
 
       setSelectedProjectTitle(firstProject.title);
       setSelectedImage(firstProjectGallery[0] ?? firstProject.image);
+      setViewerIndex(0);
       return;
     }
 
@@ -80,6 +85,7 @@ export function ProjectsSection() {
 
     if (!availableImages.includes(selectedImage)) {
       setSelectedImage(availableImages[0] ?? matchedSelectedProject.image);
+      setViewerIndex(0);
     }
   }, [filteredProjects, selectedProjectTitle, selectedImage]);
 
@@ -91,6 +97,9 @@ export function ProjectsSection() {
   const selectedProjectImages = selectedProject
     ? getProjectGalleryImages(selectedProject)
     : [];
+
+  const viewerImage =
+    selectedProjectImages[viewerIndex] ?? selectedProjectImages[0] ?? "";
 
   const visibleProjects = filteredProjects
     .filter((project) => project.title !== selectedProject?.title)
@@ -113,6 +122,102 @@ export function ProjectsSection() {
       behavior: "smooth",
     });
   };
+
+  const openViewer = (image: string) => {
+    if (selectedProjectImages.length === 0) {
+      return;
+    }
+
+    const nextIndex = selectedProjectImages.indexOf(image);
+    setViewerIndex(nextIndex >= 0 ? nextIndex : 0);
+    setIsViewerOpen(true);
+  };
+
+  const closeViewer = () => {
+    setIsViewerOpen(false);
+  };
+
+  const showPreviousViewerImage = () => {
+    if (selectedProjectImages.length <= 1) {
+      return;
+    }
+
+    setViewerIndex((currentIndex) =>
+      currentIndex === 0 ? selectedProjectImages.length - 1 : currentIndex - 1,
+    );
+  };
+
+  const showNextViewerImage = () => {
+    if (selectedProjectImages.length <= 1) {
+      return;
+    }
+
+    setViewerIndex(
+      (currentIndex) => (currentIndex + 1) % selectedProjectImages.length,
+    );
+  };
+
+  useEffect(() => {
+    if (!isViewerOpen) {
+      return undefined;
+    }
+
+    const currentImageIndex = selectedProjectImages.indexOf(selectedImage);
+
+    if (currentImageIndex >= 0) {
+      setViewerIndex(currentImageIndex);
+      return undefined;
+    }
+
+    setViewerIndex(0);
+    return undefined;
+  }, [isViewerOpen, selectedProjectImages, selectedImage]);
+
+  useEffect(() => {
+    if (!isViewerOpen) {
+      return undefined;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [isViewerOpen]);
+
+  useEffect(() => {
+    if (!isViewerOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeViewer();
+        return;
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        showPreviousViewerImage();
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        showNextViewerImage();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isViewerOpen, selectedProjectImages.length]);
 
   const isContainProject = selectedProject?.imageFit === "contain";
 
@@ -184,12 +289,15 @@ export function ProjectsSection() {
                 <div className="grid lg:grid-cols-[1.18fr_0.82fr]">
                   <div className="p-4 sm:p-5 lg:p-6">
                     <div className="project-gallery-shell">
-                      <div
-                        className={`relative project-gallery-main overflow-hidden ${
+                      <button
+                        type="button"
+                        onClick={() => openViewer(selectedImage)}
+                        className={`project-gallery-main project-gallery-main-button ${
                           isContainProject
                             ? "project-gallery-main--contain-mode"
                             : ""
                         }`}
+                        aria-label={`Open ${selectedProject.title} gallery popup`}
                       >
                         <img
                           key={selectedImage}
@@ -208,7 +316,11 @@ export function ProjectsSection() {
                             Featured Project
                           </span>
                         </div>
-                      </div>
+
+                        <div className="project-gallery-zoom-hint">
+                          Click to expand
+                        </div>
+                      </button>
 
                       <div className="project-gallery-thumbnails-wrap">
                         <button
@@ -351,6 +463,7 @@ export function ProjectsSection() {
                       const projectGallery = getProjectGalleryImages(project);
                       setSelectedProjectTitle(project.title);
                       setSelectedImage(projectGallery[0] ?? project.image);
+                      setViewerIndex(0);
                     }}
                     className="glass-panel project-card-button group overflow-hidden text-left"
                   >
@@ -434,6 +547,108 @@ export function ProjectsSection() {
           )}
         </div>
       </Container>
+
+      {selectedProject && isViewerOpen ? (
+        <div
+          className="project-lightbox-backdrop"
+          role="presentation"
+          onClick={closeViewer}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 22, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.24, ease: "easeOut" }}
+            className="project-lightbox-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${selectedProject.title} image viewer`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="project-lightbox-header">
+              <div className="min-w-0">
+                <p className="project-lightbox-eyebrow">
+                  {selectedProject.category} • {selectedProject.year}
+                </p>
+                <h3 className="project-lightbox-title">
+                  {selectedProject.title}
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeViewer}
+                className="project-lightbox-close"
+                aria-label="Close image popup"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="project-lightbox-stage">
+              {selectedProjectImages.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={showPreviousViewerImage}
+                  className="project-lightbox-nav project-lightbox-nav--left"
+                  aria-label="Show previous image"
+                >
+                  ‹
+                </button>
+              ) : null}
+
+              <img
+                key={viewerImage}
+                src={viewerImage}
+                alt={`${selectedProject.title} enlarged view ${viewerIndex + 1}`}
+                className="project-lightbox-image"
+              />
+
+              {selectedProjectImages.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={showNextViewerImage}
+                  className="project-lightbox-nav project-lightbox-nav--right"
+                  aria-label="Show next image"
+                >
+                  ›
+                </button>
+              ) : null}
+            </div>
+
+            <div className="project-lightbox-footer">
+              <p className="project-lightbox-counter">
+                Image {viewerIndex + 1} of {selectedProjectImages.length}
+              </p>
+
+              {selectedProjectImages.length > 1 ? (
+                <div className="project-lightbox-thumbnails">
+                  {selectedProjectImages.map((image, index) => {
+                    const isActiveViewerImage = index === viewerIndex;
+
+                    return (
+                      <button
+                        key={`${selectedProject.title}-viewer-image-${index}`}
+                        type="button"
+                        onClick={() => setViewerIndex(index)}
+                        className={`project-thumbnail ${
+                          isActiveViewerImage ? "project-thumbnail--active" : ""
+                        }`}
+                        aria-label={`Open image ${index + 1}`}
+                      >
+                        <img
+                          src={image}
+                          alt={`${selectedProject.title} thumbnail ${index + 1}`}
+                          className="project-thumbnail-image project-thumbnail-image--contain"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+          </motion.div>
+        </div>
+      ) : null}
     </section>
   );
 }

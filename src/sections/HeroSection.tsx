@@ -53,7 +53,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative z-10"
+            className="mobile-justify-content relative z-10"
           >
             <p className="theme-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs uppercase tracking-[0.35em]">
               {designer.experience}

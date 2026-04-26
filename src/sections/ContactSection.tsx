@@ -397,6 +397,7 @@ export function ContactSection() {
               title="Let’s create interiors that feel unforgettable."
               description="Use this section to encourage project inquiries, collaborations, or freelance design consultations."
               align="left"
+              mobileJustify
             />
           </motion.div>
 

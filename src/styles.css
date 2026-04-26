@@ -1680,3 +1680,13 @@ img {
   min-height: 78px;
   overflow-x: auto;
 }
+@media (max-width: 640px) {
+  .mobile-justify-content .theme-display,
+  .mobile-justify-content .theme-heading,
+  .mobile-justify-content .theme-copy {
+    text-align: justify;
+    text-align-last: left;
+    text-justify: inter-word;
+    hyphens: auto;
+  }
+}

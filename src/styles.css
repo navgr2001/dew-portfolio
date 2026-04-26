@@ -1676,3 +1676,7 @@ img {
     letter-spacing: 0.14em;
   }
 }
+.recaptcha-box {
+  min-height: 78px;
+  overflow-x: auto;
+}

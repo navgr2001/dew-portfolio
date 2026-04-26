@@ -1,4 +1,12 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { motion } from "motion/react";
 import emailjs from "@emailjs/browser";
 import { Container } from "../components/Container";
@@ -13,6 +21,25 @@ type FormValues = {
 
 type FormErrors = Partial<Record<keyof FormValues, string>>;
 
+type RecaptchaRenderOptions = {
+  sitekey: string;
+  theme?: "dark" | "light";
+  callback?: (token: string) => void;
+  "expired-callback"?: () => void;
+  "error-callback"?: () => void;
+};
+
+type RecaptchaApi = {
+  render: (container: HTMLElement, options: RecaptchaRenderOptions) => number;
+  reset: (widgetId?: number) => void;
+};
+
+declare global {
+  interface Window {
+    grecaptcha?: RecaptchaApi;
+  }
+}
+
 const initialValues: FormValues = {
   name: "",
   email: "",
@@ -20,6 +47,10 @@ const initialValues: FormValues = {
 };
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const RECAPTCHA_SCRIPT_URL =
+  "https://www.google.com/recaptcha/api.js?render=explicit";
+
+let recaptchaScriptPromise: Promise<RecaptchaApi> | null = null;
 
 function validateForm(values: FormValues): FormErrors {
   const errors: FormErrors = {};
@@ -53,6 +84,61 @@ function validateForm(values: FormValues): FormErrors {
   return errors;
 }
 
+function loadRecaptchaScript(): Promise<RecaptchaApi> {
+  if (typeof window === "undefined") {
+    return Promise.reject(new Error("reCAPTCHA is not available."));
+  }
+
+  if (window.grecaptcha) {
+    return Promise.resolve(window.grecaptcha);
+  }
+
+  if (recaptchaScriptPromise) {
+    return recaptchaScriptPromise;
+  }
+
+  recaptchaScriptPromise = new Promise<RecaptchaApi>((resolve, reject) => {
+    const waitForRecaptcha = () => {
+      let attempts = 0;
+
+      const intervalId = window.setInterval(() => {
+        if (window.grecaptcha) {
+          window.clearInterval(intervalId);
+          resolve(window.grecaptcha);
+          return;
+        }
+
+        attempts += 1;
+
+        if (attempts >= 50) {
+          window.clearInterval(intervalId);
+          reject(new Error("reCAPTCHA failed to load."));
+        }
+      }, 100);
+    };
+
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      `script[src="${RECAPTCHA_SCRIPT_URL}"]`,
+    );
+
+    if (existingScript) {
+      waitForRecaptcha();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = RECAPTCHA_SCRIPT_URL;
+    script.async = true;
+    script.defer = true;
+    script.onload = waitForRecaptcha;
+    script.onerror = () => reject(new Error("reCAPTCHA failed to load."));
+
+    document.head.appendChild(script);
+  });
+
+  return recaptchaScriptPromise;
+}
+
 function getFriendlyEmailJsError(error: unknown): string {
   if (typeof error === "object" && error !== null) {
     const maybeStatus = "status" in error ? String(error.status) : "";
@@ -62,14 +148,86 @@ function getFriendlyEmailJsError(error: unknown): string {
     if (maybeStatus === "429" || /rate limit|too many/i.test(maybeText)) {
       return "Too many messages were attempted too quickly. Please wait a few seconds and try again.";
     }
+
+    if (/captcha|recaptcha/i.test(maybeText)) {
+      return "reCAPTCHA verification failed. Please complete the checkbox again and retry.";
+    }
   }
 
   return "Failed to send your inquiry. Please try again in a moment.";
 }
 
+type RecaptchaVerificationProps = {
+  siteKey: string;
+  resetSignal: number;
+  onVerify: (token: string) => void;
+  onExpire: () => void;
+  onError: () => void;
+};
+
+function RecaptchaVerification({
+  siteKey,
+  resetSignal,
+  onVerify,
+  onExpire,
+  onError,
+}: RecaptchaVerificationProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const widgetIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadRecaptchaScript()
+      .then((grecaptcha) => {
+        if (
+          !isMounted ||
+          !containerRef.current ||
+          widgetIdRef.current !== null
+        ) {
+          return;
+        }
+
+        widgetIdRef.current = grecaptcha.render(containerRef.current, {
+          sitekey: siteKey,
+          theme: "dark",
+          callback: onVerify,
+          "expired-callback": onExpire,
+          "error-callback": onError,
+        });
+      })
+      .catch(() => {
+        if (isMounted) {
+          onError();
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [siteKey, onVerify, onExpire, onError]);
+
+  useEffect(() => {
+    if (widgetIdRef.current === null || !window.grecaptcha) {
+      return;
+    }
+
+    window.grecaptcha.reset(widgetIdRef.current);
+  }, [resetSignal]);
+
+  return (
+    <div className="recaptcha-box">
+      <div ref={containerRef} />
+    </div>
+  );
+}
+
 export function ContactSection() {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
@@ -81,6 +239,9 @@ export function ContactSection() {
         | string
         | undefined,
       publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY as string | undefined,
+      recaptchaSiteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY as
+        | string
+        | undefined,
     }),
     [],
   );
@@ -96,6 +257,29 @@ export function ContactSection() {
 
     return () => window.clearTimeout(timeoutId);
   }, [isSuccessPopupOpen]);
+
+  const resetCaptcha = useCallback(() => {
+    setCaptchaToken("");
+    setCaptchaResetSignal((currentValue) => currentValue + 1);
+  }, []);
+
+  const handleCaptchaVerify = useCallback((token: string) => {
+    setCaptchaToken(token);
+    setCaptchaError("");
+    setSubmitError("");
+  }, []);
+
+  const handleCaptchaExpire = useCallback(() => {
+    setCaptchaToken("");
+    setCaptchaError("reCAPTCHA expired. Please verify again.");
+  }, []);
+
+  const handleCaptchaError = useCallback(() => {
+    setCaptchaToken("");
+    setCaptchaError(
+      "reCAPTCHA could not load. Please refresh the page and try again.",
+    );
+  }, []);
 
   const handleChange =
     (field: keyof FormValues) =>
@@ -149,11 +333,17 @@ export function ContactSection() {
     if (
       !emailJsConfig.serviceId ||
       !emailJsConfig.templateId ||
-      !emailJsConfig.publicKey
+      !emailJsConfig.publicKey ||
+      !emailJsConfig.recaptchaSiteKey
     ) {
       setSubmitError(
-        "Email service is not configured yet. Add your EmailJS values to the .env file and restart the app.",
+        "Email service is not configured yet. Add your EmailJS and reCAPTCHA values to the .env file and restart the app.",
       );
+      return;
+    }
+
+    if (!captchaToken) {
+      setCaptchaError("Please complete the reCAPTCHA checkbox before sending.");
       return;
     }
 
@@ -169,6 +359,7 @@ export function ContactSection() {
           from_email: normalizedValues.email,
           reply_to: normalizedValues.email,
           project_message: normalizedValues.message,
+          "g-recaptcha-response": captchaToken,
         },
         {
           publicKey: emailJsConfig.publicKey,
@@ -178,10 +369,13 @@ export function ContactSection() {
       setValues(initialValues);
       setErrors({});
       setSubmitError("");
+      setCaptchaError("");
+      resetCaptcha();
       setIsSuccessPopupOpen(true);
     } catch (error) {
       console.error("Failed to send inquiry:", error);
       setSubmitError(getFriendlyEmailJsError(error));
+      resetCaptcha();
     } finally {
       setIsSubmitting(false);
     }
@@ -329,6 +523,24 @@ export function ContactSection() {
                   </p>
                 ) : null}
               </div>
+
+              {emailJsConfig.recaptchaSiteKey ? (
+                <div>
+                  <RecaptchaVerification
+                    siteKey={emailJsConfig.recaptchaSiteKey}
+                    resetSignal={captchaResetSignal}
+                    onVerify={handleCaptchaVerify}
+                    onExpire={handleCaptchaExpire}
+                    onError={handleCaptchaError}
+                  />
+
+                  {captchaError ? (
+                    <p className="mt-2 text-sm text-red-400" role="alert">
+                      {captchaError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               {submitError ? (
                 <div

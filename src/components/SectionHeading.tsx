@@ -5,7 +5,6 @@ type SectionHeadingProps = {
   title: string;
   description: string;
   align?: "left" | "center";
-  mobileJustify?: boolean;
 };
 
 export function SectionHeading({
@@ -13,9 +12,14 @@ export function SectionHeading({
   title,
   description,
   align = "center",
-  mobileJustify = false,
 }: SectionHeadingProps) {
   const isLeft = align === "left";
+
+  const wrapperAlignmentClass = isLeft
+    ? "mx-auto text-center sm:mx-0 sm:text-left"
+    : "mx-auto text-center";
+
+  const descriptionAlignmentClass = isLeft ? "mx-auto sm:mx-0" : "mx-auto";
 
   return (
     <motion.div
@@ -23,9 +27,7 @@ export function SectionHeading({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className={`max-w-3xl ${isLeft ? "text-left" : "mx-auto text-center"} ${
-        mobileJustify ? "mobile-justify-content" : ""
-      }`}
+      className={`max-w-3xl ${wrapperAlignmentClass}`}
     >
       <p className="theme-eyebrow mb-4 text-sm uppercase tracking-[0.35em]">
         {eyebrow}
@@ -36,9 +38,7 @@ export function SectionHeading({
       </h2>
 
       <p
-        className={`theme-copy mt-4 text-base leading-7 sm:text-lg ${
-          isLeft ? "" : "mx-auto"
-        }`}
+        className={`theme-copy mt-4 text-base leading-7 sm:text-lg ${descriptionAlignmentClass}`}
       >
         {description}
       </p>

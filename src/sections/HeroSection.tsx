@@ -53,28 +53,28 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mobile-justify-content relative z-10"
+            className="relative z-10 text-center sm:text-left"
           >
             <p className="theme-pill mb-5 inline-flex rounded-full px-4 py-2 text-xs uppercase tracking-[0.35em]">
               {designer.experience}
             </p>
 
-            <h1 className="theme-display max-w-4xl text-4xl leading-tight sm:text-5xl lg:text-7xl">
+            <h1 className="theme-display mx-auto max-w-4xl text-4xl leading-tight sm:mx-0 sm:text-5xl lg:text-7xl">
               Futuristic interiors crafted with clarity, warmth, and bold
               simplicity.
             </h1>
 
-            <p className="theme-copy mt-6 max-w-2xl text-base leading-8 sm:text-lg">
+            <p className="theme-copy mx-auto mt-6 max-w-2xl text-base leading-8 sm:mx-0 sm:text-lg">
               {designer.intro}
             </p>
 
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <div className="hero-action-buttons mt-10 flex flex-row items-center justify-center gap-3 sm:justify-start sm:gap-4">
               <motion.a
                 href="/dewmini cv new.pdf.pdf"
                 download
                 whileHover={{ y: -3, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="primary-button"
+                className="primary-button hero-action-button"
               >
                 Download CV
               </motion.a>
@@ -84,7 +84,7 @@ export function HeroSection() {
                 whileHover={{ y: -3, scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleProjectsClick}
-                className="secondary-button"
+                className="secondary-button hero-action-button"
               >
                 View Projects
               </motion.button>

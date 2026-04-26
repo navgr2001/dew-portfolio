@@ -390,14 +390,13 @@ export function ContactSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="max-w-xl"
+            className="mx-auto max-w-xl sm:mx-0"
           >
             <SectionHeading
               eyebrow="Contact Me"
               title="Let’s create interiors that feel unforgettable."
               description="Use this section to encourage project inquiries, collaborations, or freelance design consultations."
               align="left"
-              mobileJustify
             />
           </motion.div>
 

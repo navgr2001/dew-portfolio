@@ -105,9 +105,9 @@ export function AboutSection() {
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <SectionHeading
             eyebrow="About Me"
-            title="My Goal
-"
-            description="Bringing beauty into real life. A modern house or living space should reflect the personality of the owner."
+            title="My Goal"
+            description='"Bringing beauty into real life. A modern house or living space should reflect the personality of the owner."'
+            descriptionClassName="about-goal-holiday-text"
           />
 
           <AnimatedCard className="p-8 sm:p-10">

@@ -2300,3 +2300,22 @@ img {
     bottom: 58px;
   }
 }
+/* About Me goal description handwritten quote font */
+.about-goal-holiday-text {
+  max-width: 36rem;
+  font-family:
+    "Segoe Print", "Bradley Hand", "Comic Sans MS", "Trebuchet MS", cursive;
+  font-size: clamp(1rem, 0.3rem + 1.1vw, 2rem);
+  font-weight: 700;
+  line-height: 1.75;
+  letter-spacing: 0.015em;
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .about-goal-holiday-text {
+    max-width: 100%;
+    font-size: clamp(1.25rem, 1rem + 1.2vw, 1.7rem);
+    line-height: 1.65;
+  }
+}

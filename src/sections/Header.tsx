@@ -60,8 +60,8 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
           <img
             src={
               isLightMode
-                ? "/images/lightmodebrand.png"
-                : "/images/darkmodebrand.png"
+                ? "/images/lightmodelogo.png"
+                : "/images/darkmodelogo.png"
             }
             alt="Dewmini"
             className="theme-brand-image"

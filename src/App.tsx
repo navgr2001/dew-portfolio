@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Header } from "./sections/Header";
+import { IntroScreen } from "./sections/IntroScreen";
 import { HeroSection } from "./sections/HeroSection";
 import { AboutSection } from "./sections/AboutSection";
 import { ProjectsSection } from "./sections/ProjectsSection";
@@ -37,7 +38,10 @@ function getInitialTheme(): Theme {
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -110,6 +114,19 @@ function App() {
   }, []);
 
   const isLightMode = useMemo(() => theme === "light", [theme]);
+
+  const handleGetStarted = () => {
+    setShowIntro(false);
+    navigate("/", { replace: true });
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
+  };
+
+  if (showIntro) {
+    return <IntroScreen onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <div className="theme-shell min-h-screen">

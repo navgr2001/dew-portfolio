@@ -1694,3 +1694,609 @@ img {
     white-space: nowrap;
   }
 }
+
+/* =========================
+   Portfolio Intro Screen
+   ========================= */
+
+.portfolio-intro-screen {
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  background: #eef0f4;
+  overflow: hidden;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.portfolio-intro-page {
+  height: 100vh;
+  height: 100svh;
+  padding: clamp(10px, 1.2vw, 16px);
+  background: #eef0f4;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.portfolio-intro-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #e9e9e9;
+  overflow: hidden;
+  padding: clamp(22px, 2vw, 34px) clamp(24px, 3vw, 46px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-sizing: border-box;
+}
+
+.portfolio-intro-shell::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  pointer-events: none;
+}
+
+.portfolio-intro-logo {
+  position: absolute;
+  top: clamp(22px, 3vw, 36px);
+  left: clamp(22px, 3vw, 36px);
+  z-index: 5;
+  width: clamp(42px, 3.9vw, 58px);
+  height: clamp(42px, 3.9vw, 58px);
+  border: 1.5px solid #2a2a2a;
+  border-radius: 50%;
+  padding: 7px;
+  object-fit: contain;
+  background: transparent;
+}
+
+.portfolio-intro-year {
+  position: absolute;
+  top: clamp(38px, 5vh, 64px);
+  right: clamp(34px, 4.5vw, 76px);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: clamp(7rem, 11vw, 10rem);
+  font-weight: 900;
+  line-height: 0.76;
+  letter-spacing: -0.08em;
+  color: rgba(255, 255, 255, 0.68);
+  user-select: none;
+  pointer-events: none;
+}
+
+.portfolio-intro-main {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 1120px);
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(58px, 8vh, 96px) clamp(170px, 18vw, 270px)
+    clamp(36px, 5vh, 56px) clamp(36px, 4vw, 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.portfolio-intro-title {
+  margin: 0;
+  color: #000000;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: clamp(4.4rem, 8vw, 7.8rem);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: clamp(0.18em, 1.8vw, 0.34em);
+  text-indent: clamp(0.18em, 1.8vw, 0.34em);
+  text-align: center;
+}
+
+.portfolio-intro-author {
+  width: fit-content;
+  min-width: clamp(220px, 17vw, 300px);
+  margin: clamp(12px, 2vh, 18px) auto clamp(22px, 3vh, 28px);
+  padding: 5px 16px 6px;
+  background: #161722;
+  color: #ffffff;
+  font-size: clamp(0.82rem, 0.95vw, 1rem);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.portfolio-intro-image-wrap {
+  width: min(100%, 760px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.portfolio-intro-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(40vh, 380px);
+  object-fit: contain;
+  user-select: none;
+}
+
+.portfolio-intro-bottom {
+  width: 100%;
+  margin-top: clamp(10px, 1.5vh, 14px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.portfolio-intro-subtitle {
+  margin: 0;
+  color: #000000;
+  text-align: center;
+  font-family: "Comic Sans MS", "Segoe Print", "Bradley Hand", cursive;
+  font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.portfolio-intro-button {
+  position: absolute;
+  right: clamp(34px, 4.8vw, 74px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #3d3d3d;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.portfolio-intro-button span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  background: #3b3b3b;
+  color: #ffffff;
+}
+
+.portfolio-intro-button svg {
+  flex-shrink: 0;
+  color: #3d3d3d;
+}
+
+.portfolio-intro-projects {
+  position: absolute;
+  right: clamp(34px, 4.8vw, 74px);
+  bottom: clamp(74px, 10vh, 112px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #151923;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  line-height: 1.04;
+}
+
+.portfolio-intro-projects span {
+  font-size: clamp(0.72rem, 0.95vw, 0.86rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.portfolio-intro-projects strong {
+  font-size: clamp(1rem, 1.18vw, 1.28rem);
+  font-weight: 900;
+}
+
+/* =========================
+   Desktop Fine-Tuning
+   ========================= */
+
+@media (max-width: 1440px) {
+  .portfolio-intro-main {
+    width: min(100%, 1060px);
+    padding-right: clamp(150px, 16vw, 240px);
+  }
+
+  .portfolio-intro-title {
+    font-size: clamp(4rem, 7vw, 6.8rem);
+  }
+
+  .portfolio-intro-image-wrap {
+    width: min(100%, 700px);
+  }
+
+  .portfolio-intro-image {
+    max-height: min(39vh, 360px);
+  }
+}
+
+@media (max-width: 1200px) {
+  .portfolio-intro-main {
+    width: min(100%, 980px);
+    padding-right: clamp(130px, 14vw, 200px);
+    padding-top: clamp(64px, 8vh, 86px);
+    padding-bottom: 34px;
+  }
+
+  .portfolio-intro-title {
+    font-size: clamp(3.6rem, 6.4vw, 5.8rem);
+  }
+
+  .portfolio-intro-image-wrap {
+    width: min(100%, 660px);
+  }
+
+  .portfolio-intro-subtitle {
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+  }
+
+  .portfolio-intro-projects {
+    right: clamp(34px, 4.8vw, 74px);
+    bottom: clamp(66px, 9vh, 92px);
+  }
+}
+
+/* =========================
+   Tablet
+   ========================= */
+
+@media (max-width: 900px) {
+  .portfolio-intro-screen,
+  .portfolio-intro-page {
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .portfolio-intro-page {
+    padding: 10px;
+  }
+
+  .portfolio-intro-shell {
+    width: 100%;
+    height: 100%;
+    min-height: calc(100svh - 20px);
+    padding: 18px 18px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .portfolio-intro-shell::before {
+    inset: 10px;
+  }
+
+  .portfolio-intro-logo {
+    top: 18px;
+    left: 18px;
+    width: 42px;
+    height: 42px;
+    padding: 5px;
+  }
+
+  .portfolio-intro-year {
+    top: 34px;
+    right: 16px;
+    font-size: clamp(4.8rem, 16vw, 7rem);
+    line-height: 0.8;
+    opacity: 0.78;
+  }
+
+  .portfolio-intro-main {
+    width: 100%;
+    flex: 1 1 auto;
+    height: auto;
+    padding: 68px 18px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 2vh, 22px);
+  }
+
+  .portfolio-intro-title {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(2.9rem, 8.4vw, 4.5rem);
+    letter-spacing: 0.11em;
+    text-indent: 0.11em;
+    line-height: 0.96;
+  }
+
+  .portfolio-intro-author {
+    min-width: 160px;
+    margin: 0 auto;
+    padding: 5px 14px 6px;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  .portfolio-intro-image-wrap {
+    width: min(100%, 520px);
+    margin: 0 auto;
+  }
+
+  .portfolio-intro-image {
+    width: 100%;
+    max-height: min(32vh, 300px);
+    object-fit: contain;
+  }
+
+  .portfolio-intro-bottom {
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .portfolio-intro-subtitle {
+    width: 100%;
+    max-width: 10ch;
+    margin: 0 auto;
+    text-align: center;
+    font-size: clamp(2.05rem, 6.2vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+  }
+
+  .portfolio-intro-button {
+    position: static;
+    transform: none;
+
+    margin-bottom: 100px;
+    margin: 20px auto 0;
+    display: inline-flex;
+    align-self: center;
+    gap: 12px;
+    font-size: 0.95rem;
+  }
+
+  .portfolio-intro-button span {
+    min-height: 36px;
+    padding: 0 14px;
+  }
+
+  .portfolio-intro-projects {
+    position: static;
+    right: auto;
+    bottom: auto;
+    margin: 12px auto 2px;
+    align-items: center;
+    text-align: center;
+    align-self: center;
+  }
+
+  .portfolio-intro-projects span {
+    font-size: 0.76rem;
+  }
+
+  .portfolio-intro-projects strong {
+    font-size: 1.06rem;
+  }
+}
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 560px) {
+  .portfolio-intro-screen,
+  .portfolio-intro-page {
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .portfolio-intro-page {
+    padding: 0;
+  }
+
+  .portfolio-intro-shell {
+    height: 100%;
+    min-height: 100svh;
+    border: 0;
+    padding: 14px 14px 22px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .portfolio-intro-shell::before {
+    inset: 8px;
+  }
+
+  .portfolio-intro-logo {
+    top: 16px;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    padding: 4px;
+  }
+
+  .portfolio-intro-year {
+    top: 42px;
+    right: 12px;
+    font-size: clamp(4.4rem, 23vw, 5.8rem);
+    line-height: 0.78;
+    opacity: 0.66;
+  }
+
+  .portfolio-intro-main {
+    width: 100%;
+    height: auto;
+    flex: 1 1 auto;
+    padding: 62px 10px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 2.5vh, 22px);
+  }
+
+  .portfolio-intro-title {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    font-size: clamp(2.15rem, 9.5vw, 3.05rem);
+    letter-spacing: 0.07em;
+    text-indent: 0.07em;
+    line-height: 0.98;
+  }
+
+  .portfolio-intro-author {
+    min-width: 150px;
+    margin: 0 auto;
+    padding: 5px 12px 6px;
+    font-size: 0.72rem;
+    text-align: center;
+  }
+
+  .portfolio-intro-image-wrap {
+    width: min(100%, 335px);
+    margin: 0 auto;
+  }
+
+  .portfolio-intro-image {
+    width: 100%;
+    max-height: clamp(170px, 27vh, 230px);
+    object-fit: contain;
+  }
+
+  .portfolio-intro-bottom {
+    width: 100%;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .portfolio-intro-subtitle {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    font-size: clamp(1.9rem, 8.3vw, 2.45rem);
+    line-height: 1.08;
+    letter-spacing: 0.01em;
+  }
+
+  .portfolio-intro-button {
+    position: static;
+    transform: none;
+    margin: 0 auto;
+    margin-bottom: 70px;
+    margin-top: -120px;
+    display: inline-flex;
+    align-self: center;
+    gap: 13px;
+    font-size: 0.92rem;
+  }
+
+  .portfolio-intro-button span {
+    min-height: 36px;
+    padding: 0 14px;
+  }
+
+  .portfolio-intro-projects {
+    position: static;
+    right: auto;
+    bottom: auto;
+    margin: 0 auto;
+    align-items: center;
+    text-align: center;
+  }
+
+  .portfolio-intro-projects span {
+    font-size: 0.72rem;
+  }
+
+  .portfolio-intro-projects strong {
+    font-size: 1rem;
+  }
+}
+
+/* Smaller mobile height adjustment */
+@media (max-width: 560px) and (max-height: 760px) {
+  .portfolio-intro-shell {
+    padding-bottom: 18px;
+  }
+
+  .portfolio-intro-main {
+    padding-top: 52px;
+    gap: clamp(10px, 1.8vh, 16px);
+  }
+
+  .portfolio-intro-image-wrap {
+    width: min(100%, 315px);
+  }
+
+  .portfolio-intro-image {
+    max-height: clamp(150px, 23vh, 175px);
+  }
+
+  .portfolio-intro-title {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+
+  .portfolio-intro-subtitle {
+    font-size: clamp(1.75rem, 7.8vw, 2.25rem);
+  }
+}
+/* =========================
+   Short Height Devices
+   ========================= */
+
+@media (max-height: 760px) and (min-width: 901px) {
+  .portfolio-intro-main {
+    padding-top: 42px;
+    padding-bottom: 28px;
+  }
+
+  .portfolio-intro-title {
+    font-size: clamp(3.5rem, 6.6vw, 5.6rem);
+  }
+
+  .portfolio-intro-author {
+    margin-bottom: 16px;
+  }
+
+  .portfolio-intro-image {
+    max-height: 34vh;
+  }
+
+  .portfolio-intro-bottom {
+    margin-top: 8px;
+  }
+
+  .portfolio-intro-projects {
+    bottom: 58px;
+  }
+}

@@ -2319,3 +2319,42 @@ img {
     line-height: 1.65;
   }
 }
+/* Contact section left-side image */
+.contact-intro-image-wrap {
+  margin-top: 2.5rem;
+  width: min(100%, 30rem);
+  overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  box-shadow: 0 24px 70px var(--shadow-color);
+}
+
+.contact-intro-image {
+  display: block;
+  width: 100%;
+  height: clamp(16rem, 24vw, 24rem);
+  object-fit: cover;
+  user-select: none;
+}
+
+@media (max-width: 1024px) {
+  .contact-intro-image-wrap {
+    margin: 2.25rem auto 0;
+  }
+
+  .contact-intro-image {
+    height: clamp(15rem, 42vw, 22rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-intro-image-wrap {
+    margin-top: 2rem;
+    border-radius: 1.5rem;
+  }
+
+  .contact-intro-image {
+    height: 16rem;
+  }
+}

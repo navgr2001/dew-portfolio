@@ -16,31 +16,11 @@ import {
 
 type Theme = "dark" | "light";
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") {
-    return "dark";
-  }
-
-  try {
-    const savedTheme = window.localStorage.getItem("portfolio-theme");
-
-    if (savedTheme === "dark" || savedTheme === "light") {
-      return savedTheme;
-    }
-
-    return window.matchMedia("(prefers-color-scheme: light)").matches
-      ? "light"
-      : "dark";
-  } catch {
-    return "dark";
-  }
-}
-
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setTheme] = useState<Theme>("light");
   const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {

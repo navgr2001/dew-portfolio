@@ -398,6 +398,15 @@ export function ContactSection() {
               description="Use this section to encourage project inquiries, collaborations, or freelance design consultations."
               align="left"
             />
+
+            <div className="contact-intro-image-wrap">
+              <img
+                src="/images/contactmeimage.png"
+                alt="Interior design contact preview"
+                className="contact-intro-image"
+                draggable={false}
+              />
+            </div>
           </motion.div>
 
           <motion.div

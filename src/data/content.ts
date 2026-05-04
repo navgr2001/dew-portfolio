@@ -6,7 +6,7 @@ export const designer = {
     "Designing refined, functional interiors that feel timeless, immersive, and emotionally connected to the people who live in them.",
   about:
     "I am an interior designer focused on residential, boutique commercial, and hospitality-inspired spaces. Over the last two years, I have worked on concept development, space planning, material selection, styling, and client presentation decks. My approach blends minimal luxury, clean geometry, and intentional detail to create spaces that feel calm, modern, and memorable.",
-  email: "deminirodrigo3@gmail.com",
+  email: "dewrodrigo@gmail.com",
   phone: "+94 75 032 4440",
   location: "Colombo, Sri Lanka",
 };
@@ -48,15 +48,30 @@ export type Project = {
 export const projects: Project[] = [
   {
     title: "PERSONAL SCULPTURAL SPACE",
+    category: "Furniture Design",
+    year: "2023",
+    image: "/images/Academic/project1/image1.png",
+    imageFit: "contain",
+    images: ["/images/Academic/project1/designdevelopment.png"],
+    description:
+      "Item for space use by individual with privacy in order to ergonomics and anthropometrics. It is an artistic form which has been worked into three-dimensional form. With the influence of and research into the concepts of Geoffrey Bawa, I developed a relaxing bed concept that feels more ideal for personal comfort and reflection.",
+    detailSections: [
+      {
+        subtitle: "CONCEPT",
+        description:
+          "Relaxing and peaceful evenings play a major role in the client life of Chamithra Sadanayaka, as she works all day and studies as well. She likes to spend her evening in a personal space with a calm environment while listening to music and spending time with nature. The chosen site, Jetwing Lagoon in Negombo, next to the lagoon, with natural surroundings and colorful evening sunsets, reflects that sense of relaxation. The sunset became the inspiration that signals the end of the day and the beginning of rest. Therefore, the concept is the moment of relaxation.",
+      },
+    ],
+  },
+  {
+    title: "TECHNICAL DRAWINGS",
     category: "Residential",
-    year: "2026",
-    image: "/images/project1/image1.png",
+    year: "2023",
+    image: "/images/Academic/project1/technicaldrawing.png",
     imageFit: "contain",
     images: [
-      "/images/project1/designdevelopment.png",
-      "/images/project1/technicaldrawing.png",
-      "/images/project1/technicaldrawing2.png",
-      "/images/project1/technicaldrawing3.png",
+      "/images/Academic/project1/technicaldrawing2.png",
+      "/images/Academic/project1/technicaldrawing3.png",
     ],
     description:
       "Item for space use by individual with privacy in order to ergonomics and anthropometrics. It is an artistic form which has been worked into three-dimensional form. With the influence of and research into the concepts of Geoffrey Bawa, I developed a relaxing bed concept that feels more ideal for personal comfort and reflection.",
@@ -70,14 +85,14 @@ export const projects: Project[] = [
   },
   {
     title: "RETAIL SHOPPABILITY RETAIL STORE AT A MALL",
-    category: "Residential",
-    year: "2025",
-    image: "/images/project2/moodboard.png",
+    category: "Retail & Commercial",
+    year: "2023",
+    image: "/images/Academic/project2/moodboard.png",
     imageFit: "contain",
     images: [
-      "/images/project2/tecdraw1.png",
-      "/images/project2/tecdraw2.png",
-      "/images/project2/3d.png",
+      "/images/Academic/project2/tecdraw1.png",
+      "/images/Academic/project2/tecdraw2.png",
+      "/images/Academic/project2/3d.png",
     ],
     description:
       "Retail shoppability: the capacity to transform consumer needs anddesires into purchases. This impressive  feat is accomplished by marshalling all of an organization’s assets – people, places and practices – to deliver rewarding shopping experiences to customers. K-Zone where thewill be placed is a two-storey shopping mall complex in the vicinity of the Kapuwatta suburb area of Ja- Ela, outside Colombo, Sri Lanka. It offers retail therapy within the confines of a relaxed “all under one roof” atmosphere featuring a department store, retail outlets, food court, electronic stores, gift shops and others offering a range of products and services for even the most discerning shopper in a Sri Lankan culture.",
@@ -93,9 +108,12 @@ export const projects: Project[] = [
     title: "CAFE DESIGN TO NIC",
     category: "Residential",
     year: "2025",
-    image: "/images/project3/image1.png",
+    image: "/images/Academic/project3/image1.png",
     imageFit: "contain",
-    images: ["/images/project3/image2.png", "/images/project3/image3.png"],
+    images: [
+      "/images/Academic/project3/image2.png",
+      "/images/project3/image3.png",
+    ],
     description:
       "Design features are the colors , textures and the bilss that an indiviual experience while being in the presence of the garden .INSPIRED BY THE COLOUR OF VEGETATION .As the STORYLINE make the user feel as if thet are in an organic environment ,utimately creating a sense of being in touch with nature while having local healthy food .Also NEW LEAF the concept of the project means to change the course and start fresh which that user come inside brings the same feeling itself",
   },
@@ -103,9 +121,12 @@ export const projects: Project[] = [
     title: "EATERY WITH TWIST: SEAFOOD RESTAURANT TO LAGOON DECK",
     category: "Residential",
     year: "2024",
-    image: "/images/project4/image1.png",
+    image: "/images/Academic/project4/image1.png",
     imageFit: "contain",
-    images: ["/images/project4/image2.png", "/images/project4/image3.png"],
+    images: [
+      "/images/Academic/project4/image2.png",
+      "/images/Academic/project4/image3.png",
+    ],
     description:
       "restaurant is a place where people pay to sit and eat meals that are cooked and served on the premises. Beyond the basic purpose of restaurants to provide food and drink, restaurants have, historically, fulfilled a human need for connection and shaped social relations. Offer An Experience. What makes a restaurant iconic is the experience it offers to the customers. Lagoon deck restaurant , which is my site as well as my client situated in Katunayake in Negombo area Sri Lanka is a two story building . Next to lagoon atmosphere is just great, good place to hangout with your family / friends. both indoor and outdoor dinning there with specially on delicious seafood menus .There is also a pool facing the lagoon with water activities in lagoon such as boat rides experiences .And it is close to Negombo beach where many of Negombo people trend to hangout . As Sri Lanka surrounded by the Indian ocean where I going to use were captivated by the costal lagoon features of Sri Lanka . The fishing industry became an iconic symbol in Sri Lanka specially in Negombo area which is also the heart of the country economy and culture. it reminds the exploration of wilderness and tropical atmosphere of lagoon with the taste of famous and mostly available food in the Negombo area which is seafood.",
     detailSections: [
@@ -117,8 +138,8 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "Velvet Horizon Bedroom Suite",
-    category: "Residential",
+    title: "SRI VILLA BEACH AYU ARANA - NEGOMBO",
+    category: "Wellness &  Healthcare",
     year: "2024",
     image:
       "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
@@ -162,101 +183,94 @@ export const projects: Project[] = [
       "A premium executive lounge concept with dramatic textures, moody lighting, luxury seating, and a strong visual identity for high-end business hospitality.",
   },
   {
-    title: "Frame Co-Working Hub",
-    category: "Commercial",
-    year: "2024",
-    image:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=80",
+    title: "GPV GALLERY - NEGOMBO",
+    category: "Retail & Commercial",
+    year: "2025",
+    image: "/images/Industrial/RandC/gpv/gallery.png",
+    imageFit: "contain",
     description:
       "A flexible co-working environment designed to feel open, smart, and social with modular seating, layered zoning, and refined monochrome finishes.",
   },
+
   {
-    title: "Luma Café Experience",
-    category: "Hospitality",
-    year: "2026",
-    image:
-      "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80",
-    description:
-      "A cozy yet futuristic café interior using plain tones, tactile materials, ambient lighting, and intimate seating arrangements to create an inviting social atmosphere.",
-  },
-  {
-    title: "Noir Fine Dining Interior",
-    category: "Hospitality",
+    title: "AVE MARIA HOSPITAL - NEGOMBO",
+    category: "Healthcare",
     year: "2025",
-    image:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/Healthcare/avemariahospital/hospital1.png",
+    imageFit: "contain",
     description:
       "An upscale restaurant concept with curated mood lighting, sophisticated seating layouts, layered textures, and a memorable premium dining identity.",
   },
   {
-    title: "Halo Boutique Hotel Lobby",
-    category: "Hospitality",
+    title: "GPV SIGNAGE DESIGNS - NEGOMBO",
+    category: "Retail & Commercial",
     year: "2025",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/RandC/gpv/signage.png",
+    imageFit: "contain",
     description:
       "A boutique hotel lobby designed to make a striking first impression through sculptural forms, elegant materials, and a luxurious spatial flow.",
   },
   {
-    title: "Prism Resort Suite",
-    category: "Hospitality",
+    title: "PALACE APARTMENT - GAMPAHA",
+    category: "Residential",
     year: "2024",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/Residential/palace/palace1.png",
+    imageFit: "contain",
     description:
       "A resort suite interior that combines relaxation and elegance with soft geometry, premium surfaces, and a calm, immersive guest experience.",
   },
   {
-    title: "Canvas Fashion Boutique",
-    category: "Retail",
-    year: "2026",
-    image:
-      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80",
+    title: "ICONIC GALAXY APARTMENT - COLOMBO",
+    category: "Residential",
+    year: "2025",
+    image: "/images/Industrial/Residential/iconic/iconic1.png",
+    imageFit: "contain",
     description:
       "A modern fashion retail concept with clean display systems, futuristic lighting accents, and a customer flow designed to elevate product presentation.",
   },
   {
-    title: "Axis Jewelry Showroom",
-    category: "Retail",
+    title: "HOUSING PROJECT - MARAWILA",
+    category: "Residential",
     year: "2025",
-    image:
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/Residential/marawila/marawila1.png",
+    imageFit: "contain",
+    images: ["/images/Industrial/Residential/marawila/marawila2.png"],
     description:
       "A luxury showroom interior focused on detail, contrast, premium finishes, and carefully lit display zones to create an elevated shopping experience.",
   },
   {
-    title: "Form Beauty Studio",
-    category: "Retail",
-    year: "2024",
-    image:
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80",
+    title: "SANTORINI APARTMENTS - VILLA 1",
+    category: "Residential",
+    year: "2025",
+    image: "/images/Industrial/Residential/santorini/santorinivilla1.png",
+    imageFit: "contain",
     description:
       "A sleek beauty studio with mirrored surfaces, elegant textures, and a polished contemporary design that supports both service and retail functions.",
   },
   {
-    title: "Nest Kids Room Concept",
-    category: "Concept Design",
+    title: "SANTORINI APARTMENTS - VILLA 2",
+    category: "Residential",
     year: "2025",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/Residential/santorini/santorinivilla2.png",
+    imageFit: "contain",
     description:
       "A playful concept bedroom designed with safety, storage, soft shapes, and a future-ready aesthetic tailored for comfort and imagination.",
   },
   {
-    title: "Eclipse Home Office",
-    category: "Concept Design",
-    year: "2024",
-    image:
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80",
+    title: "SANTORINI APARTMENTS - VILLA 3",
+    category: "Residential",
+    year: "2026",
+    image: "/images/Industrial/Residential/santorini/santorinivilla3.png",
+    imageFit: "contain",
     description:
       "A compact yet premium home office concept featuring ergonomic planning, clean lines, integrated lighting, and a distraction-free environment.",
   },
   {
-    title: "Oasis Spa Interior",
-    category: "Concept Design",
+    title: "RIO CAFE",
+    category: "Hospitality",
     year: "2026",
-    image:
-      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Industrial/Hostpitality/riocafe1.png",
+    imageFit: "contain",
     description:
       "A wellness-focused spa concept with calming textures, soft transitions, ambient lighting, and a serene luxury atmosphere for relaxation.",
   },

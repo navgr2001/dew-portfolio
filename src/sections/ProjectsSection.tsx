@@ -9,6 +9,117 @@ const INITIAL_VISIBLE_COUNT = 6;
 const LOAD_MORE_COUNT = 6;
 const SWIPE_THRESHOLD = 48;
 
+const PROJECT_MAIN_TABS = ["Academic", "Industrial"] as const;
+
+type ProjectMainTab = (typeof PROJECT_MAIN_TABS)[number];
+
+type StructuredProjectCategory =
+  | "Retail & Commercial"
+  | "Furniture Design"
+  | "Residential"
+  | "Hospitality"
+  | "Wellness & Healthcare";
+
+type StructuredProjectRule = {
+  category: StructuredProjectCategory;
+  projectNames: string[];
+};
+
+const PROJECT_STRUCTURE: Record<ProjectMainTab, StructuredProjectRule[]> = {
+  Academic: [
+    {
+      category: "Retail & Commercial",
+      projectNames: [
+        "retail shopability",
+        "retail shoppability",
+        "retail shop ability",
+        "retail shop",
+      ],
+    },
+    {
+      category: "Furniture Design",
+      projectNames: [
+        "personal sculpture space",
+        "personal sculptural space",
+        "sculpture space",
+        "sculptural space",
+      ],
+    },
+    {
+      category: "Residential",
+      projectNames: ["technical drawings", "technical drawing", "technical"],
+    },
+    {
+      category: "Hospitality",
+      projectNames: [
+        "cafe design to nic",
+        "café design to nic",
+        "nic cafe",
+        "nic café",
+        "eatary with twist",
+        "eatery with twist",
+        "seafood restaurant",
+        "lagoon deck",
+      ],
+    },
+    {
+      category: "Wellness & Healthcare",
+      projectNames: [
+        "sri villa beach ayu arana",
+        "sri villa beach",
+        "ayu arana",
+        "villa beach",
+      ],
+    },
+  ],
+  Industrial: [
+    {
+      category: "Residential",
+      projectNames: [
+        "palace appartment gampaha",
+        "palace apartment gampaha",
+        "palace appartment",
+        "palace apartment",
+        "iconic galaxy apartment colombo",
+        "iconic galaxy",
+        "housing project marawila",
+        "marawila",
+        "santorini appartments villa 1",
+        "santorini apartments villa 1",
+        "santorini villa 1",
+        "santorini appartments villa 2",
+        "santorini apartments villa 2",
+        "santorini villa 2",
+        "santorini appartments villa 3",
+        "santorini apartments villa 3",
+        "santorini villa 3",
+      ],
+    },
+    {
+      category: "Wellness & Healthcare",
+      projectNames: [
+        "ave maria hospital negombo",
+        "ave maria hospital",
+        "ave maria",
+      ],
+    },
+    {
+      category: "Retail & Commercial",
+      projectNames: [
+        "gpv gallery negombo",
+        "gpv gallery",
+        "gpv signage designs negombo",
+        "gpv signage design negombo",
+        "gpv signage",
+      ],
+    },
+    {
+      category: "Hospitality",
+      projectNames: ["rio cafe", "rio café"],
+    },
+  ],
+};
+
 function getProjectGalleryImages(project: {
   image: string;
   images?: string[];
@@ -16,16 +127,71 @@ function getProjectGalleryImages(project: {
   return Array.from(new Set([project.image, ...(project.images ?? [])]));
 }
 
+function normalizeValue(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[’']/g, "")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function normalizeProjectSearchText(project: {
+  title: string;
+  category: string;
+  description: string;
+  year: string;
+}) {
+  return normalizeValue(
+    [project.title, project.category, project.description, project.year].join(
+      " ",
+    ),
+  );
+}
+
+function findStructuredProjectMeta(project: {
+  title: string;
+  category: string;
+  description: string;
+  year: string;
+}) {
+  const projectSearchText = normalizeProjectSearchText(project);
+
+  for (const mainTab of PROJECT_MAIN_TABS) {
+    const categoryRules = PROJECT_STRUCTURE[mainTab];
+
+    for (const categoryRule of categoryRules) {
+      const matchedProjectIndex = categoryRule.projectNames.findIndex(
+        (projectName) =>
+          projectSearchText.includes(normalizeValue(projectName)),
+      );
+
+      if (matchedProjectIndex >= 0) {
+        return {
+          mainTab,
+          category: categoryRule.category,
+          categoryIndex: categoryRules.indexOf(categoryRule),
+          projectIndex: matchedProjectIndex,
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
 export function ProjectsSection() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeMainTab, setActiveMainTab] =
+    useState<ProjectMainTab>("Academic");
+  const [activeCategory, setActiveCategory] =
+    useState<StructuredProjectCategory>(PROJECT_STRUCTURE.Academic[0].category);
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [selectedProjectTitle, setSelectedProjectTitle] = useState<
     string | null
-  >(projects[0]?.title ?? null);
-  const [selectedImage, setSelectedImage] = useState<string>(
-    projects[0]?.image ?? "",
-  );
+  >(null);
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
 
@@ -33,34 +199,84 @@ export function ProjectsSection() {
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
-  const categories = useMemo(() => {
-    const uniqueCategories = Array.from(
-      new Set(projects.map((project) => project.category)),
-    );
-    return ["All", ...uniqueCategories];
+  const availableCategories = PROJECT_STRUCTURE[activeMainTab].map(
+    (categoryRule) => categoryRule.category,
+  );
+
+  useEffect(() => {
+    setActiveCategory(PROJECT_STRUCTURE[activeMainTab][0].category);
+  }, [activeMainTab]);
+
+  const structuredProjects = useMemo(() => {
+    return projects
+      .map((project) => {
+        const structuredMeta = findStructuredProjectMeta(project);
+
+        if (!structuredMeta) {
+          return null;
+        }
+
+        return {
+          project,
+          structuredMeta,
+        };
+      })
+      .filter(
+        (
+          item,
+        ): item is {
+          project: (typeof projects)[number];
+          structuredMeta: NonNullable<
+            ReturnType<typeof findStructuredProjectMeta>
+          >;
+        } => item !== null,
+      )
+      .sort((firstItem, secondItem) => {
+        const mainTabDifference =
+          PROJECT_MAIN_TABS.indexOf(firstItem.structuredMeta.mainTab) -
+          PROJECT_MAIN_TABS.indexOf(secondItem.structuredMeta.mainTab);
+
+        if (mainTabDifference !== 0) {
+          return mainTabDifference;
+        }
+
+        const categoryDifference =
+          firstItem.structuredMeta.categoryIndex -
+          secondItem.structuredMeta.categoryIndex;
+
+        if (categoryDifference !== 0) {
+          return categoryDifference;
+        }
+
+        return (
+          firstItem.structuredMeta.projectIndex -
+          secondItem.structuredMeta.projectIndex
+        );
+      });
   }, []);
 
   const filteredProjects = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const normalizedSearch = normalizeValue(searchTerm);
 
-    return projects.filter((project) => {
-      const matchesCategory =
-        activeCategory === "All" || project.category === activeCategory;
+    return structuredProjects
+      .filter(({ project, structuredMeta }) => {
+        const matchesMainTab = structuredMeta.mainTab === activeMainTab;
+        const matchesCategory = structuredMeta.category === activeCategory;
 
-      const matchesSearch =
-        normalizedSearch === "" ||
-        project.title.toLowerCase().includes(normalizedSearch) ||
-        project.category.toLowerCase().includes(normalizedSearch) ||
-        project.description.toLowerCase().includes(normalizedSearch) ||
-        project.year.toLowerCase().includes(normalizedSearch);
+        const matchesSearch =
+          normalizedSearch === "" ||
+          normalizeProjectSearchText(project).includes(normalizedSearch) ||
+          normalizeValue(structuredMeta.category).includes(normalizedSearch) ||
+          normalizeValue(structuredMeta.mainTab).includes(normalizedSearch);
 
-      return matchesCategory && matchesSearch;
-    });
-  }, [activeCategory, searchTerm]);
+        return matchesMainTab && matchesCategory && matchesSearch;
+      })
+      .map(({ project }) => project);
+  }, [activeCategory, activeMainTab, searchTerm, structuredProjects]);
 
   useEffect(() => {
     setVisibleCount(INITIAL_VISIBLE_COUNT);
-  }, [activeCategory, searchTerm]);
+  }, [activeMainTab, activeCategory, searchTerm]);
 
   const selectedProject = useMemo(
     () =>
@@ -69,6 +285,13 @@ export function ProjectsSection() {
       ) ?? filteredProjects[0],
     [filteredProjects, selectedProjectTitle],
   );
+
+  const selectedProjectMeta = selectedProject
+    ? findStructuredProjectMeta(selectedProject)
+    : null;
+
+  const selectedProjectCategory =
+    selectedProjectMeta?.category ?? selectedProject?.category ?? "";
 
   const selectedProjectImages = useMemo(
     () => (selectedProject ? getProjectGalleryImages(selectedProject) : []),
@@ -94,6 +317,10 @@ export function ProjectsSection() {
       return;
     }
 
+    if (selectedProjectTitle !== selectedProject.title) {
+      setSelectedProjectTitle(selectedProject.title);
+    }
+
     const currentImageIndex = selectedProjectImages.indexOf(selectedImage);
 
     if (currentImageIndex === -1) {
@@ -103,7 +330,13 @@ export function ProjectsSection() {
     }
 
     setViewerIndex(currentImageIndex);
-  }, [filteredProjects, selectedProject, selectedProjectImages, selectedImage]);
+  }, [
+    filteredProjects,
+    selectedProject,
+    selectedProjectImages,
+    selectedImage,
+    selectedProjectTitle,
+  ]);
 
   const visibleProjects = filteredProjects
     .filter((project) => project.title !== selectedProject?.title)
@@ -263,9 +496,9 @@ export function ProjectsSection() {
         />
 
         <div className="mt-12 space-y-8">
-          <div className="glass-panel overflow-hidden p-4 sm:p-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
+          <div className="glass-panel project-browser-panel overflow-hidden p-4 sm:p-5 lg:p-6">
+            <div className="project-browser-top">
+              <div className="project-browser-summary">
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
                   Browse Projects
                 </p>
@@ -278,7 +511,7 @@ export function ProjectsSection() {
                 </p>
               </div>
 
-              <div className="w-full lg:max-w-sm">
+              <div className="project-browser-search">
                 <input
                   type="text"
                   value={searchTerm}
@@ -289,21 +522,52 @@ export function ProjectsSection() {
               </div>
             </div>
 
-            <div className="mt-5 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {categories.map((category) => {
-                const isActive = category === activeCategory;
+            <div className="project-filter-groups">
+              <div className="project-filter-group">
+                <p className="project-filter-label">Project Type</p>
+                <div className="project-filter-row">
+                  {PROJECT_MAIN_TABS.map((mainTab) => {
+                    const isActive = mainTab === activeMainTab;
 
-                return (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => setActiveCategory(category)}
-                    className={`project-filter-button ${isActive ? "project-filter-button--active" : ""}`}
-                  >
-                    {category}
-                  </button>
-                );
-              })}
+                    return (
+                      <button
+                        key={mainTab}
+                        type="button"
+                        onClick={() => setActiveMainTab(mainTab)}
+                        className={`project-filter-button project-main-filter-button ${
+                          isActive ? "project-filter-button--active" : ""
+                        }`}
+                      >
+                        {mainTab}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="project-filter-group">
+                <p className="project-filter-label">
+                  {activeMainTab} Categories
+                </p>
+                <div className="project-filter-row">
+                  {availableCategories.map((category) => {
+                    const isActive = category === activeCategory;
+
+                    return (
+                      <button
+                        key={`${activeMainTab}-${category}`}
+                        type="button"
+                        onClick={() => setActiveCategory(category)}
+                        className={`project-filter-button ${
+                          isActive ? "project-filter-button--active" : ""
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -315,10 +579,10 @@ export function ProjectsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ duration: 0.75, ease: "easeOut" }}
-                whileHover={{ y: -6 }}
+                whileHover={{ y: -4 }}
                 className="glass-panel project-feature-card overflow-hidden"
               >
-                <div className="grid lg:grid-cols-[1.18fr_0.82fr]">
+                <div className="grid lg:grid-cols-[1.12fr_0.88fr]">
                   <div className="p-4 sm:p-5 lg:p-6">
                     <div className="project-gallery-shell">
                       <button
@@ -410,13 +674,13 @@ export function ProjectsSection() {
                     <div className="project-feature-details-layout">
                       <div className="project-feature-details-scroll">
                         <div>
-                          <div className="mb-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.28em] text-zinc-500">
-                            <span>{selectedProject.category}</span>
-                            <span className="h-1 w-1 rounded-full bg-zinc-600" />
+                          <div className="project-meta-row">
+                            <span>{selectedProjectCategory}</span>
+                            <span className="project-meta-dot" />
                             <span>{selectedProject.year}</span>
                           </div>
 
-                          <h3 className="max-w-xl text-3xl font-medium leading-tight text-white sm:text-4xl">
+                          <h3 className="project-feature-title">
                             {selectedProject.title}
                           </h3>
 
@@ -446,27 +710,21 @@ export function ProjectsSection() {
                       </div>
 
                       <div className="project-feature-stats mt-8 grid gap-4 sm:grid-cols-3">
-                        <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4">
-                          <p className="text-[0.7rem] uppercase tracking-[0.28em] text-zinc-500">
-                            Type
-                          </p>
-                          <p className="mt-2 text-sm text-white">
-                            {selectedProject.category}
+                        <div className="project-stat-card">
+                          <p className="project-stat-label">Type</p>
+                          <p className="project-stat-value">
+                            {selectedProjectCategory}
                           </p>
                         </div>
-                        <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4">
-                          <p className="text-[0.7rem] uppercase tracking-[0.28em] text-zinc-500">
-                            Year
-                          </p>
-                          <p className="mt-2 text-sm text-white">
+                        <div className="project-stat-card">
+                          <p className="project-stat-label">Year</p>
+                          <p className="project-stat-value">
                             {selectedProject.year}
                           </p>
                         </div>
-                        <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-4">
-                          <p className="text-[0.7rem] uppercase tracking-[0.28em] text-zinc-500">
-                            Gallery
-                          </p>
-                          <p className="mt-2 text-sm text-white">
+                        <div className="project-stat-card">
+                          <p className="project-stat-label">Gallery</p>
+                          <p className="project-stat-value">
                             {selectedProjectImages.length} image
                             {selectedProjectImages.length === 1 ? "" : "s"}
                           </p>
@@ -478,64 +736,70 @@ export function ProjectsSection() {
               </motion.article>
 
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {visibleProjects.map((project, index) => (
-                  <motion.button
-                    key={`${project.title}-${index}`}
-                    type="button"
-                    initial={{ opacity: 0, y: 35 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{
-                      duration: 0.7,
-                      delay: index * 0.06,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{ y: -6, scale: 1.01 }}
-                    onClick={() => {
-                      const projectGallery = getProjectGalleryImages(project);
-                      setSelectedProjectTitle(project.title);
-                      setSelectedImage(projectGallery[0] ?? project.image);
-                      setViewerIndex(0);
-                      setIsViewerOpen(false);
-                    }}
-                    className="glass-panel project-card-button group overflow-hidden text-left"
-                  >
-                    <div className="relative overflow-hidden rounded-[1.6rem]">
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="h-72 w-full object-cover transition duration-700 group-hover:scale-105"
-                      />
-                      <div className="project-image-overlay" />
-                    </div>
+                {visibleProjects.map((project, index) => {
+                  const projectMeta = findStructuredProjectMeta(project);
+                  const projectCategory =
+                    projectMeta?.category ?? project.category;
 
-                    <div className="p-6">
-                      <div className="mb-4 flex items-center justify-between gap-4 text-xs uppercase tracking-[0.28em] text-zinc-500">
-                        <span>{project.category}</span>
-                        <span>{project.year}</span>
+                  return (
+                    <motion.button
+                      key={`${project.title}-${index}`}
+                      type="button"
+                      initial={{ opacity: 0, y: 35 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{
+                        duration: 0.7,
+                        delay: index * 0.06,
+                        ease: "easeOut",
+                      }}
+                      whileHover={{ y: -6, scale: 1.01 }}
+                      onClick={() => {
+                        const projectGallery = getProjectGalleryImages(project);
+                        setSelectedProjectTitle(project.title);
+                        setSelectedImage(projectGallery[0] ?? project.image);
+                        setViewerIndex(0);
+                        setIsViewerOpen(false);
+                      }}
+                      className="glass-panel project-card-button group overflow-hidden text-left"
+                    >
+                      <div className="relative overflow-hidden rounded-[1.6rem]">
+                        <img
+                          src={project.image}
+                          alt={project.title}
+                          className="h-72 w-full object-cover transition duration-700 group-hover:scale-105"
+                        />
+                        <div className="project-image-overlay" />
                       </div>
 
-                      <h3 className="text-2xl font-medium text-white">
-                        {project.title}
-                      </h3>
-                      <p className="mt-4 line-clamp-4 leading-7 text-zinc-400">
-                        {project.description}
-                      </p>
+                      <div className="p-6">
+                        <div className="mb-4 flex items-center justify-between gap-4 text-xs uppercase tracking-[0.28em] text-zinc-500">
+                          <span>{projectCategory}</span>
+                          <span>{project.year}</span>
+                        </div>
 
-                      <div className="mt-5 flex items-center justify-between gap-4">
-                        <span className="text-xs uppercase tracking-[0.24em] text-zinc-500">
-                          Click to view
-                        </span>
-                        <span className="text-sm text-white">
-                          {getProjectGalleryImages(project).length} image
-                          {getProjectGalleryImages(project).length === 1
-                            ? ""
-                            : "s"}
-                        </span>
+                        <h3 className="text-2xl font-medium text-white">
+                          {project.title}
+                        </h3>
+                        <p className="mt-4 line-clamp-4 leading-7 text-zinc-400">
+                          {project.description}
+                        </p>
+
+                        <div className="mt-5 flex items-center justify-between gap-4">
+                          <span className="text-xs uppercase tracking-[0.24em] text-zinc-500">
+                            Click to view
+                          </span>
+                          <span className="text-sm text-white">
+                            {getProjectGalleryImages(project).length} image
+                            {getProjectGalleryImages(project).length === 1
+                              ? ""
+                              : "s"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  );
+                })}
               </div>
 
               <div className="flex flex-col items-center gap-4 pt-2">
@@ -570,11 +834,11 @@ export function ProjectsSection() {
                 No Results Found
               </p>
               <h3 className="mt-4 text-2xl font-medium text-white">
-                Try another keyword or project category
+                Try another project type, category, or keyword
               </h3>
               <p className="mx-auto mt-3 max-w-xl leading-7 text-zinc-400">
-                Your portfolio section stays clean even with many projects
-                because users can quickly narrow down what they want to see.
+                This category does not have matching projects yet. Try another
+                tab or search keyword.
               </p>
             </div>
           )}
@@ -600,7 +864,7 @@ export function ProjectsSection() {
             <div className="project-lightbox-topbar">
               <div className="min-w-0">
                 <p className="project-lightbox-eyebrow">
-                  {selectedProject.category} • {selectedProject.year}
+                  {selectedProjectCategory} • {selectedProject.year}
                 </p>
                 <h3 className="project-lightbox-title">
                   {selectedProject.title}

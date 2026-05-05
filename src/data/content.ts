@@ -141,8 +141,16 @@ export const projects: Project[] = [
     title: "SRI VILLA BEACH AYU ARANA - NEGOMBO",
     category: "Wellness &  Healthcare",
     year: "2024",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    image: "/images/Academic/ayuarana/ayuarana1.png",
+    imageFit: "contain",
+    images: [
+      "/images/Academic/ayuarana/ayuarana2.png",
+      "/images/Academic/ayuarana/ayuarana3.png",
+      "/images/Academic/ayuarana/ayuarana4.png",
+      "/images/Academic/ayuarana/ayuarana5.png",
+      "/images/Academic/ayuarana/ayuarana6.png",
+      "/images/Academic/ayuarana/ayuarana7.png",
+    ],
     description:
       "A luxurious bedroom suite with soft ambient lighting, elegant headboard detailing, integrated storage, and a restful monochrome-inspired design language.",
   },

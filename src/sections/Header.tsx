@@ -17,9 +17,13 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const closeMobileMenu = () => {
+    setIsOpen(false);
+  };
+
   const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    setIsOpen(false);
+    closeMobileMenu();
 
     if (location.pathname !== "/") {
       navigate("/");
@@ -33,7 +37,7 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
     (path: string, targetId: string) =>
     (event: MouseEvent<HTMLAnchorElement>) => {
       event.preventDefault();
-      setIsOpen(false);
+      closeMobileMenu();
 
       if (location.pathname !== path) {
         navigate(path);
@@ -50,7 +54,7 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="theme-header fixed inset-x-0 top-0 z-[9999] w-full backdrop-blur-xl"
     >
-      <Container className="flex min-h-20 items-center justify-between gap-4">
+      <Container className="relative z-[10002] flex min-h-20 items-center justify-between gap-4">
         <Link
           to="/"
           onClick={handleHomeClick}
@@ -122,7 +126,8 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
             className="theme-icon-button inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden"
-            aria-label="Toggle menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
             {isOpen ? <HiX size={22} /> : <HiMenuAlt3 size={22} />}
           </button>
@@ -130,7 +135,16 @@ export function Header({ isLightMode, onToggleTheme }: HeaderProps) {
       </Container>
 
       {isOpen && (
-        <div className="theme-mobile-menu md:hidden">
+        <button
+          type="button"
+          className="theme-mobile-menu-backdrop md:hidden"
+          aria-label="Close navigation menu"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {isOpen && (
+        <div className="theme-mobile-menu relative z-[10002] md:hidden">
           <Container className="flex flex-col py-5">
             {navItems.map((item) => (
               <Link

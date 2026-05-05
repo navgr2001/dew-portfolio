@@ -232,6 +232,19 @@ img {
   background: color-mix(in srgb, var(--bg-primary) 90%, transparent);
 }
 
+.theme-mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: default;
+}
+
 .theme-brand {
   display: inline-flex;
   align-items: center;

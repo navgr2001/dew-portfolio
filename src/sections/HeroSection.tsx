@@ -100,7 +100,7 @@ export function HeroSection() {
           >
             <div className="theme-hero-card relative mx-auto aspect-[4/5] max-w-md overflow-hidden p-4">
               <img
-                src="/images/profimage.jpeg"
+                src="/images/profimage1.jpeg"
                 alt="Interior designer portfolio hero visual"
                 className="h-full w-full rounded-[1.5rem] object-cover"
               />

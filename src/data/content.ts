@@ -112,7 +112,7 @@ export const projects: Project[] = [
     imageFit: "contain",
     images: [
       "/images/Academic/project3/image2.png",
-      "/images/project3/image3.png",
+      "/images/Academic/project3/image3.png",
     ],
     description:
       "Design features are the colors , textures and the bilss that an indiviual experience while being in the presence of the garden .INSPIRED BY THE COLOUR OF VEGETATION .As the STORYLINE make the user feel as if thet are in an organic environment ,utimately creating a sense of being in touch with nature while having local healthy food .Also NEW LEAF the concept of the project means to change the course and start fresh which that user come inside brings the same feeling itself",

@@ -2704,3 +2704,304 @@ img {
     font-size: 1.05rem;
   }
 }
+
+/* =========================
+   Project Popup Image-Focused View
+   ========================= */
+
+.project-lightbox-backdrop {
+  padding: 0.9rem;
+  background: rgba(7, 6, 5, 0.78);
+  backdrop-filter: blur(16px);
+}
+
+.project-lightbox-dialog {
+  width: min(98vw, 1480px);
+  height: min(94vh, 940px);
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem;
+  border-radius: 1.7rem;
+  background: color-mix(in srgb, var(--surface-elevated) 96%, transparent);
+}
+
+/* Make header compact so the image becomes the main focus */
+.project-lightbox-topbar {
+  position: absolute;
+  top: 1.45rem;
+  left: 1.45rem;
+  right: 1.45rem;
+  z-index: 10;
+  padding: 0;
+  border-bottom: 0;
+  pointer-events: none;
+}
+
+/* Hide project title/description inside popup */
+.project-lightbox-topbar > .min-w-0 {
+  display: none;
+}
+
+.project-lightbox-topbar-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  pointer-events: auto;
+}
+
+.project-lightbox-counter {
+  padding: 0.65rem 0.9rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--surface-elevated) 90%, transparent);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+}
+
+.project-lightbox-close {
+  width: 3.1rem;
+  min-width: 3.1rem;
+  height: 3.1rem;
+  background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+  box-shadow: 0 10px 24px var(--shadow-color);
+}
+
+/* Main layout: bigger image, smaller gallery */
+.project-lightbox-content {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 11.5rem;
+  gap: 0.9rem;
+}
+
+/* Bigger image stage */
+.project-lightbox-stage {
+  min-height: 0;
+  height: 100%;
+  padding: 1rem 4.2rem;
+  border-radius: 1.45rem;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(var(--accent-rgb), 0.05),
+      transparent 34%
+    ),
+    color-mix(in srgb, var(--surface-soft) 92%, transparent);
+}
+
+/* Image gets maximum available space */
+.project-lightbox-image {
+  max-width: 100%;
+  max-height: calc(94vh - 4.2rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1rem;
+}
+
+/* Side arrows stay clean and visible */
+.project-lightbox-nav {
+  width: 3rem;
+  min-width: 3rem;
+  height: 3rem;
+  background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
+  box-shadow: 0 12px 28px var(--shadow-color);
+}
+
+.project-lightbox-nav--left {
+  left: 1rem;
+}
+
+.project-lightbox-nav--right {
+  right: 1rem;
+}
+
+/* Smaller gallery sidebar */
+.project-lightbox-sidebar {
+  height: 100%;
+  min-height: 0;
+  padding: 0.85rem;
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--surface-soft) 86%, transparent);
+}
+
+.project-lightbox-sidebar-header {
+  margin-bottom: 0.75rem;
+}
+
+.project-lightbox-sidebar-title {
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+}
+
+.project-lightbox-sidebar-subtitle {
+  margin-top: 0.35rem;
+  font-size: 0.76rem;
+}
+
+.project-lightbox-thumbnails {
+  gap: 0.55rem;
+  max-height: calc(100% - 5.8rem);
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.project-lightbox-thumbnails .project-thumbnail {
+  width: 100%;
+  min-width: 100%;
+  height: 4.5rem;
+  border-radius: 0.85rem;
+}
+
+.project-lightbox-thumbnails .project-thumbnail-image {
+  border-radius: 0.75rem;
+}
+
+.project-lightbox-sidebar-tip {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+}
+
+/* =========================
+   Tablet Popup
+   ========================= */
+
+@media (max-width: 1024px) {
+  .project-lightbox-dialog {
+    width: 98vw;
+    height: 94vh;
+    padding: 0.8rem;
+  }
+
+  .project-lightbox-content {
+    grid-template-columns: minmax(0, 1fr) 9.5rem;
+    gap: 0.75rem;
+  }
+
+  .project-lightbox-stage {
+    padding: 1rem 3.5rem;
+  }
+
+  .project-lightbox-image {
+    max-height: calc(94vh - 3.8rem);
+  }
+
+  .project-lightbox-thumbnails .project-thumbnail {
+    height: 4rem;
+  }
+}
+
+/* =========================
+   Mobile Popup
+   ========================= */
+
+@media (max-width: 760px) {
+  .project-lightbox-backdrop {
+    padding: 0;
+  }
+
+  .project-lightbox-dialog {
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    max-height: 100svh;
+    padding: 0.75rem;
+    border-radius: 0;
+  }
+
+  .project-lightbox-topbar {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+  }
+
+  .project-lightbox-counter {
+    font-size: 0.62rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .project-lightbox-close {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .project-lightbox-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .project-lightbox-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    padding: 3.8rem 0.75rem 1rem;
+    border-radius: 1.2rem;
+  }
+
+  .project-lightbox-image {
+    max-width: 100%;
+    max-height: calc(100svh - 11rem);
+    border-radius: 0.8rem;
+  }
+
+  .project-lightbox-nav {
+    width: 2.55rem;
+    min-width: 2.55rem;
+    height: 2.55rem;
+    font-size: 1.55rem;
+  }
+
+  .project-lightbox-nav--left {
+    left: 0.7rem;
+  }
+
+  .project-lightbox-nav--right {
+    right: 0.7rem;
+  }
+
+  /* Mobile gallery becomes a small bottom strip */
+  .project-lightbox-sidebar {
+    flex: 0 0 auto;
+    height: auto;
+    padding: 0.7rem;
+    border-radius: 1rem;
+  }
+
+  .project-lightbox-sidebar-header,
+  .project-lightbox-sidebar-tip {
+    display: none;
+  }
+
+  .project-lightbox-thumbnails {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0 0.15rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .project-lightbox-thumbnails::-webkit-scrollbar {
+    display: none;
+  }
+
+  .project-lightbox-thumbnails .project-thumbnail {
+    width: 4.8rem;
+    min-width: 4.8rem;
+    height: 3.6rem;
+  }
+}

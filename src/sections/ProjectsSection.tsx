@@ -8,6 +8,8 @@ import { projects } from "../data/content";
 const INITIAL_VISIBLE_COUNT = 6;
 const LOAD_MORE_COUNT = 6;
 const SWIPE_THRESHOLD = 48;
+const MIN_VIEWER_ZOOM = 1;
+const MAX_VIEWER_ZOOM = 4;
 
 const PROJECT_MAIN_TABS = ["Academic", "Industrial"] as const;
 
@@ -194,10 +196,16 @@ export function ProjectsSection() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const [viewerZoom, setViewerZoom] = useState(1);
+  const [viewerPan, setViewerPan] = useState({ x: 0, y: 0 });
 
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+  const pinchStartDistanceRef = useRef<number | null>(null);
+  const pinchStartZoomRef = useRef(1);
+  const lastTouchPointRef = useRef<{ x: number; y: number } | null>(null);
+  const isPinchingRef = useRef(false);
 
   const availableCategories = PROJECT_STRUCTURE[activeMainTab].map(
     (categoryRule) => categoryRule.category,
@@ -382,6 +390,7 @@ export function ProjectsSection() {
 
     setViewerIndex(normalizedIndex);
     setSelectedImage(nextImage);
+    resetViewerZoom();
   };
 
   const openViewer = (image: string) => {
@@ -392,6 +401,7 @@ export function ProjectsSection() {
 
   const closeViewer = () => {
     setIsViewerOpen(false);
+    resetViewerZoom();
   };
 
   const showPreviousViewerImage = () => {
@@ -448,13 +458,157 @@ export function ProjectsSection() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isViewerOpen, viewerIndex, selectedProjectImages.length]);
 
+  const clampViewerZoom = (value: number) => {
+    return Math.min(Math.max(value, MIN_VIEWER_ZOOM), MAX_VIEWER_ZOOM);
+  };
+
+  const getTouchDistance = (touches: React.TouchList) => {
+    const firstTouch = touches[0];
+    const secondTouch = touches[1];
+
+    return Math.hypot(
+      secondTouch.clientX - firstTouch.clientX,
+      secondTouch.clientY - firstTouch.clientY,
+    );
+  };
+
+  const getTouchCenter = (touches: React.TouchList) => {
+    const firstTouch = touches[0];
+    const secondTouch = touches[1];
+
+    return {
+      x: (firstTouch.clientX + secondTouch.clientX) / 2,
+      y: (firstTouch.clientY + secondTouch.clientY) / 2,
+    };
+  };
+
+  const resetViewerZoom = () => {
+    setViewerZoom(1);
+    setViewerPan({ x: 0, y: 0 });
+    pinchStartDistanceRef.current = null;
+    pinchStartZoomRef.current = 1;
+    lastTouchPointRef.current = null;
+    isPinchingRef.current = false;
+  };
+
   const handleViewerTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    const firstTouch = event.touches[0];
-    touchStartXRef.current = firstTouch.clientX;
-    touchStartYRef.current = firstTouch.clientY;
+    if (event.touches.length === 2) {
+      event.preventDefault();
+
+      isPinchingRef.current = true;
+      pinchStartDistanceRef.current = getTouchDistance(event.touches);
+      pinchStartZoomRef.current = viewerZoom;
+      lastTouchPointRef.current = getTouchCenter(event.touches);
+      touchStartXRef.current = null;
+      touchStartYRef.current = null;
+      return;
+    }
+
+    if (event.touches.length === 1) {
+      const firstTouch = event.touches[0];
+
+      isPinchingRef.current = false;
+      lastTouchPointRef.current = {
+        x: firstTouch.clientX,
+        y: firstTouch.clientY,
+      };
+
+      touchStartXRef.current = firstTouch.clientX;
+      touchStartYRef.current = firstTouch.clientY;
+    }
+  };
+
+  const handleViewerTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length === 2) {
+      event.preventDefault();
+
+      const startDistance = pinchStartDistanceRef.current;
+
+      if (!startDistance) {
+        pinchStartDistanceRef.current = getTouchDistance(event.touches);
+        pinchStartZoomRef.current = viewerZoom;
+        lastTouchPointRef.current = getTouchCenter(event.touches);
+        return;
+      }
+
+      const currentDistance = getTouchDistance(event.touches);
+      const nextZoom = clampViewerZoom(
+        pinchStartZoomRef.current * (currentDistance / startDistance),
+      );
+
+      const currentCenter = getTouchCenter(event.touches);
+      const previousCenter = lastTouchPointRef.current;
+
+      if (previousCenter && nextZoom > 1) {
+        const deltaX = currentCenter.x - previousCenter.x;
+        const deltaY = currentCenter.y - previousCenter.y;
+
+        setViewerPan((currentPan) => ({
+          x: currentPan.x + deltaX,
+          y: currentPan.y + deltaY,
+        }));
+      }
+
+      lastTouchPointRef.current = currentCenter;
+      setViewerZoom(nextZoom);
+      return;
+    }
+
+    if (event.touches.length === 1 && viewerZoom > 1) {
+      event.preventDefault();
+
+      const firstTouch = event.touches[0];
+      const previousTouchPoint = lastTouchPointRef.current;
+
+      if (!previousTouchPoint) {
+        lastTouchPointRef.current = {
+          x: firstTouch.clientX,
+          y: firstTouch.clientY,
+        };
+        return;
+      }
+
+      const deltaX = firstTouch.clientX - previousTouchPoint.x;
+      const deltaY = firstTouch.clientY - previousTouchPoint.y;
+
+      setViewerPan((currentPan) => ({
+        x: currentPan.x + deltaX,
+        y: currentPan.y + deltaY,
+      }));
+
+      lastTouchPointRef.current = {
+        x: firstTouch.clientX,
+        y: firstTouch.clientY,
+      };
+    }
   };
 
   const handleViewerTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length === 1) {
+      const remainingTouch = event.touches[0];
+
+      lastTouchPointRef.current = {
+        x: remainingTouch.clientX,
+        y: remainingTouch.clientY,
+      };
+
+      pinchStartDistanceRef.current = null;
+      pinchStartZoomRef.current = viewerZoom;
+      return;
+    }
+
+    if (isPinchingRef.current) {
+      isPinchingRef.current = false;
+      pinchStartDistanceRef.current = null;
+      lastTouchPointRef.current = null;
+      return;
+    }
+
+    if (viewerZoom > 1) {
+      lastTouchPointRef.current = null;
+      return;
+    }
+
     if (touchStartXRef.current === null || touchStartYRef.current === null) {
       return;
     }
@@ -465,6 +619,7 @@ export function ProjectsSection() {
 
     touchStartXRef.current = null;
     touchStartYRef.current = null;
+    lastTouchPointRef.current = null;
 
     if (
       Math.abs(deltaX) < SWIPE_THRESHOLD ||
@@ -895,7 +1050,9 @@ export function ProjectsSection() {
               <div
                 className="project-lightbox-stage"
                 onTouchStart={handleViewerTouchStart}
+                onTouchMove={handleViewerTouchMove}
                 onTouchEnd={handleViewerTouchEnd}
+                onTouchCancel={handleViewerTouchEnd}
               >
                 {selectedProjectImages.length > 1 ? (
                   <button
@@ -912,7 +1069,13 @@ export function ProjectsSection() {
                   key={viewerImage}
                   src={viewerImage}
                   alt={`${selectedProject.title} enlarged view ${viewerIndex + 1}`}
-                  className="project-lightbox-image"
+                  className={`project-lightbox-image ${
+                    viewerZoom > 1 ? "project-lightbox-image--zoomed" : ""
+                  }`}
+                  style={{
+                    transform: `translate3d(${viewerPan.x}px, ${viewerPan.y}px, 0) scale(${viewerZoom})`,
+                  }}
+                  draggable={false}
                 />
 
                 {selectedProjectImages.length > 1 ? (

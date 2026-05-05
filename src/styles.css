@@ -3005,3 +3005,42 @@ img {
     height: 3.6rem;
   }
 }
+
+/* =========================
+   Mobile / Tablet Popup Pinch Zoom
+   ========================= */
+
+.project-lightbox-stage {
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.project-lightbox-image {
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  transition: transform 0.08s ease-out;
+}
+
+.project-lightbox-image--zoomed {
+  cursor: grab;
+}
+
+@media (max-width: 1024px) {
+  .project-lightbox-stage {
+    touch-action: none;
+  }
+
+  .project-lightbox-image {
+    max-width: 100%;
+    max-height: calc(100svh - 11rem);
+  }
+}
+
+@media (max-width: 760px) {
+  .project-lightbox-image {
+    max-height: calc(100svh - 10.5rem);
+  }
+}
